@@ -1,7 +1,6 @@
 ---
 import { fechaService, ajusteService } from '@/services/strapi';
 import type { Fecha, ArchivoFormulario } from '@/types/strapi';
-import { STRAPI_URL } from 'astro:env/server';
 
 // Obtener las fechas de temporada y estado de inscripción desde Strapi
 let fecha: Fecha | null = null;
@@ -136,7 +135,7 @@ function formatearFecha(fechaISO: string): string {
                                 <p class="text-white/70 text-sm">Archivo: {formularioInscripcion.name}</p>
                             </div>
                             <a 
-                                href={`${STRAPI_URL}${formularioInscripcion.url}`}
+                                href={`${formularioInscripcion.url}`}
                                 download={formularioInscripcion.name}
                                 class="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-primary font-bold py-4 px-8 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/50 group"
                             >

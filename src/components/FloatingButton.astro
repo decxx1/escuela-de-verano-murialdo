@@ -1,7 +1,6 @@
 ---
 import { contactoService, ajusteService } from '@/services/strapi';
 import type { ArchivoFormulario } from '@/types/strapi';
-import { STRAPI_URL } from 'astro:env/server';
 
 // Obtener datos de contacto y ajustes desde Strapi
 let whatsappNumber = '';
@@ -44,7 +43,7 @@ try {
     <div id="floating-options" class="floating-options hidden">
         {mostrarFormulario && formularioInscripcion && (
             <a 
-                href={`${STRAPI_URL}${formularioInscripcion.url}`}
+                href={`${formularioInscripcion.url}`}
                 download={formularioInscripcion.name}
                 class="floating-option download-option"
             >
