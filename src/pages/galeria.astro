@@ -1,0 +1,36 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import AlbumGrid from '@/components/galeria/AlbumGrid.astro';
+import { galeriasService } from '@/services/strapi';
+import type { Album } from '@/types/strapi';
+
+const preloadImages = [
+	{
+		href:"/images/temporada.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+
+// Obtener álbumes desde Strapi
+let albumes: Album[] = [];
+
+try {
+	const response = await galeriasService.getGalerias(1, 25);
+	albumes = response.data;
+} catch (error) {
+	console.error('Error al obtener álbumes:', error);
+}
+---
+
+<Layout
+	title="Escuela de verano - Galería"
+	canonical="https://escueladeveranomurialdo.com.ar/galeria"
+	metaDescription="Revive los mejores momentos de nuestra escuela de verano. Explora nuestros álbumes de fotos con las actividades y eventos que realizamos en el Club Leonardo Murialdo."
+	metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp"
+	preLoad={preloadImages}
+>
+	<Breadcrumb title="Fotos" img="/images/temporada.webp" />
+	<AlbumGrid albumes={albumes} />
+</Layout>

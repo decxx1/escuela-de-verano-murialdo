@@ -1,0 +1,26 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import SeasonDates from '@/components/temporada/SeasonDates.astro';
+import Prices from '@/components/temporada/Prices.astro';
+
+const preloadImages = [
+	{
+		href:"/images/temporada.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+---
+
+<Layout
+	title="Escuela de verano - Fechas, horarios y precios"
+	canonical="https://escueladeveranomurialdo.com.ar/temporada"
+	metaDescription="Todo lo que necesitas saber para inscribirte. Ahora podrás saber cuándo empezamos la temporada, los precios actuales y los horarios de entrada y salida"
+	metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp"
+	preLoad={preloadImages}
+>
+	<Breadcrumb title="Fechas y precios" img="/images/temporada.webp" />
+    <SeasonDates />
+	<Prices />
+</Layout>

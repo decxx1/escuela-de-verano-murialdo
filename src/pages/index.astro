@@ -1,0 +1,35 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Hero from '@/components/Hero.astro';
+import Activities from '@/components/index/Activities.astro';
+import CTAInscription from '@/components/index/CTAInscription.astro';
+import Pillars from '@/components/index/Pillars.astro';
+import Divisions from '@/components/index/Divisions.astro';
+import About from '@/components/index/About.astro';
+import FAQ from '@/components/index/FAQ.astro';
+
+const preloadImages = [
+	{
+		href:"/images/index/escuela-de-verano.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+---
+
+<Layout
+	title="Escuela de verano - Club Leonardo Murialdo"
+	canonical="https://escueladeveranomurialdo.com.ar"
+	metaDescription="Seguridad, aprendizaje y diversión asegurada, durante muchos años El club leonardo Murialdo ha realizado la escuela de verano en mendoza para cientos de chicos"
+	metaImg="https://escueladeveranomurialdo.com.ar/images/index/escuela-de-verano.webp"
+	preLoad={preloadImages}
+>
+	<Hero />
+	<Activities />
+	<CTAInscription />
+	<Pillars />
+	<Divisions />
+	<About />
+	<FAQ />
+
+</Layout>

@@ -1,0 +1,24 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import AllActivities from '@/components/actividades/AllActivities.astro';
+
+const preloadImages = [
+	{
+		href:"/images/temporada.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+---
+
+<Layout
+	title="Escuela de verano - Actividades"
+	canonical="https://escueladeveranomurialdo.com.ar/actividades"
+	metaDescription="Conocé todas las actividades que realizamos durante la temporada. Campamentos, actividades deportivas, actividades de recreación y natación y muchas más."
+	metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp"
+	preLoad={preloadImages}
+>
+	<Breadcrumb title="Actividades" img="/images/temporada.webp" />
+    <AllActivities />
+</Layout>

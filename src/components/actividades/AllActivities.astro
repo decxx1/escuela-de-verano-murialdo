@@ -1,0 +1,170 @@
+---
+import { actividadesService } from '@/services/strapi';
+import type { Actividad } from '@/types/strapi';
+import { marked } from 'marked';
+
+// Configurar marked para generar HTML seguro
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+// Obtener las actividades desde Strapi durante el build
+let actividades: Actividad[] = [];
+try {
+  const response = await actividadesService.getActividades();
+  actividades = response.data;
+} catch (error) {
+  console.error('Error al obtener actividades:', error);
+}
+
+// Función para calcular el tamaño de la card basado en el contenido
+function getBentoClass(actividad: Actividad, index: number): { gridClass: string; minHeight: string } {
+  const descripcionLength = actividad.Descripcion.length;
+  const tituloLength = actividad.Titulo.length;
+  const totalLength = descripcionLength + tituloLength;
+  
+  // Clasificar por longitud de contenido
+  // Contenido muy largo (>1500 caracteres)
+  if (totalLength > 1500) {
+    return {
+      gridClass: 'md:col-span-2',
+      minHeight: 'min-h-[600px]'
+    };
+  }
+  // Contenido largo (>800 caracteres)
+  else if (totalLength > 800) {
+    // Alternar entre ancho y normal para variedad
+    return {
+      gridClass: index % 2 === 0 ? 'md:col-span-2' : 'md:col-span-1',
+      minHeight: 'min-h-[450px]'
+    };
+  }
+  // Contenido medio (>600 caracteres)
+  else if (totalLength > 600) {
+    return {
+      gridClass: 'md:col-span-2',
+      minHeight: 'min-h-[450px]'
+    };
+  }
+  // Contenido medio (>400 caracteres)
+  else if (totalLength > 400) {
+    return {
+      gridClass: 'md:col-span-1',
+      minHeight: 'min-h-[350px]'
+    };
+  }
+  // Contenido corto
+  else {
+    return {
+      gridClass: 'md:col-span-1',
+      minHeight: 'min-h-[250px]'
+    };
+  }
+}
+---
+
+<section class="py-8 container mx-auto">
+    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+        <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Todas las Actividades</h2>
+        <p class="mt-2 text-white text-xl text-center mb-12">Descubrí todas las actividades que ofrecemos en nuestra escuela de verano</p>
+        
+        <!-- Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-auto">
+            {actividades.map((actividad, index) => {
+                const { gridClass, minHeight } = getBentoClass(actividad, index);
+                const isLarge = gridClass.includes('col-span-2');
+                
+                return (
+                    <article 
+                        class={`${gridClass} ${minHeight} border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col`}
+                    >
+                        <div class="p-6 flex flex-col h-full">
+                            {/* Header con icono y título */}
+                            <div class="flex items-start gap-4 mb-4">
+                                {actividad.Icono && (
+                                    <div class="shrink-0 w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center">
+                                        <svg 
+                                            width={actividad.Icono.width} 
+                                            height={actividad.Icono.height}
+                                            viewBox={`0 0 ${actividad.Icono.width} ${actividad.Icono.height}`}
+                                            class="w-8 h-8 text-secondary"
+                                            set:html={actividad.Icono.iconData}
+                                        />
+                                    </div>
+                                )}
+                                <div class="flex-1">
+                                    <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl mb-1">
+                                        {actividad.Titulo}
+                                    </h3>
+                                    {actividad.Subtitulo && (
+                                        <p class="text-white text-sm md:text-base font-medium">
+                                            {actividad.Subtitulo}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Descripción con Markdown */}
+                            <div 
+                                class={`text-white prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:text-white prose-headings:text-white prose-blockquote:text-gray-300 prose-a:text-white flex-1 overflow-y-auto ${isLarge ? 'prose-base' : 'prose-sm'}`}
+                                set:html={marked.parse(actividad.Descripcion)}
+                            />
+                        </div>
+                    </article>
+                );
+            })}
+        </div>
+
+        {/* Mensaje si no hay actividades */}
+        {actividades.length === 0 && (
+            <div class="text-center py-12">
+                <p class="text-white text-xl">No hay actividades disponibles en este momento.</p>
+            </div>
+        )}
+    </section>
+</section>
+
+<style>
+    /* Estilos personalizados para el contenido markdown */
+    article :global(ul) {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+    }
+    
+    article :global(ol) {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+    }
+    
+    article :global(li) {
+        margin-bottom: 0.25rem;
+    }
+    
+    article :global(strong) {
+        font-weight: 700;
+    }
+    
+    article :global(p) {
+        line-height: 1.6;
+    }
+
+    /* Scroll suave para descripciones largas */
+    article > div > div:last-child {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(var(--color-secondary), 0.5) transparent;
+    }
+
+    article > div > div:last-child::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    article > div > div:last-child::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    article > div > div:last-child::-webkit-scrollbar-thumb {
+        background-color: rgba(var(--color-secondary), 0.5);
+        border-radius: 3px;
+    }
+</style>

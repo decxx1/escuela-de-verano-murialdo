@@ -1,0 +1,14 @@
+---
+// Recibir email de contacto por props
+interface Props {
+  mapIframe: string;
+}
+
+const { mapIframe } = Astro.props;
+---
+
+{mapIframe && (
+    <article class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300">
+        <div class="aspect-auto" set:html={mapIframe} />
+    </article>
+)}

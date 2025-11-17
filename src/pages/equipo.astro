@@ -1,0 +1,63 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import TeamGrid from '@/components/equipo/TeamGrid.astro';
+import { equipoService, ajusteService } from '@/services/strapi';
+import type { MiembroEquipo } from '@/types/strapi';
+
+const preloadImages = [
+	{
+		href:"/images/temporada.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+
+// Obtener datos del equipo y ajustes desde Strapi
+let equipoActivo: MiembroEquipo[] = [];
+let mostrarEquipo = false;
+
+try {
+	// Obtener ajustes para verificar si está habilitado
+	const ajustesResponse = await ajusteService.getAjustes();
+	const habilitado = ajustesResponse.data.HabilitarEquipo;
+	
+	if (habilitado) {
+		// Obtener equipo
+		const equipoResponse = await equipoService.getEquipos();
+		
+		// Filtrar solo los miembros activos
+		equipoActivo = equipoResponse.data.filter(miembro => miembro.Activo);
+		mostrarEquipo = equipoActivo.length > 0;
+	}
+} catch (error) {
+	console.error('Error al obtener equipo:', error);
+}
+---
+
+<Layout
+	title="Escuela de verano - Nuestro Equipo"
+	canonical="https://escueladeveranomurialdo.com.ar/equipo"
+	metaDescription="Conocé al equipo de profesionales de la Escuela de Verano del Club Leonardo Murialdo. Profesores y personal comprometidos con la educación y diversión de los chicos."
+	metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp"
+	preLoad={preloadImages}
+>
+	<Breadcrumb title="Equipo" img="/images/temporada.webp" />
+	
+	{mostrarEquipo ? (
+		<TeamGrid equipo={equipoActivo} />
+	) : (
+		<section class="py-8 container mx-auto">
+			<div class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+				<div class="text-center py-20">
+					<div class="border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
+						<h2 class="font-atma font-bold text-primary text-outline-2 text-3xl md:text-4xl mb-4">Nuestro equipo</h2>
+						<p class="text-white text-xl">
+							Estamos reuniendo todos los datos necesarios.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+	)}
+</Layout>

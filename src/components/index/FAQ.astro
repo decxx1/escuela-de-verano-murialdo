@@ -1,0 +1,115 @@
+---
+import { preguntasFrecuentesService } from '@/services/strapi';
+import type { PreguntaFrecuente } from '@/types/strapi';
+import { marked } from 'marked';
+
+// Configurar marked para generar HTML seguro
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+// Obtener las preguntas frecuentes desde Strapi durante el build
+let preguntas: PreguntaFrecuente[] = [];
+try {
+  const response = await preguntasFrecuentesService.getPreguntas();
+  preguntas = response.data;
+} catch (error) {
+  console.error('Error al obtener preguntas frecuentes:', error);
+}
+---
+
+<section class="py-8 container mx-auto" id="preguntas-frecuentes">
+    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+        <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center">Preguntas frecuentes</h2>
+        <p class="mt-2 text-white text-xl text-center mb-12">Resolvemos las dudas más comunes sobre nuestra escuela de verano</p>
+        
+        <!-- FAQ Bento Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12 items-start">
+            
+            {preguntas.map((pregunta, index) => {
+                const isFirst = index === 0;
+                const isOpen = isFirst;
+                
+                return (
+                    <div 
+                        class={`${isFirst ? 'md:col-span-2' : ''} faq-item border-2 border-white rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-white hover:shadow`}
+                        data-open={isOpen ? 'true' : 'false'}
+                    >
+                        <button class="faq-button w-full text-left px-4 py-2 flex justify-between items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-secondary/20 p-3 rounded-xl shrink-0">
+                                    <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <h3 class={`faq-answer ${isOpen ? 'text-secondary' : 'text-white'} text-xl font-semibold`}>
+                                    {pregunta.Pregunta}
+                                </h3>
+                            </div>
+                            <svg class={`faq-icon w-6 h-6 text-white transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class={`faq-content px-4 transition-all duration-300 ${isOpen ? 'pb-2 max-h-full' : 'pb-0 max-h-0 overflow-hidden'}`}>
+                            <div 
+                                class="text-white text-base leading-relaxed pl-16 prose prose-invert prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1"
+                                set:html={marked.parse(pregunta.Respuesta)}
+                            />
+                        </div>
+                    </div>
+                );
+            })}
+
+        </div>
+    </section>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            const button = item.querySelector('.faq-button');
+            const content = item.querySelector('.faq-content');
+            const icon = item.querySelector('.faq-icon');
+            const answer = item.querySelector('.faq-answer');
+            
+            button?.addEventListener('click', () => {
+                const isOpen = item.getAttribute('data-open') === 'true';
+                
+                // Cerrar todos los demás items
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.setAttribute('data-open', 'false');
+                        const otherContent = otherItem.querySelector('.faq-content');
+                        const otherIcon = otherItem.querySelector('.faq-icon');
+                        const otherAnswer = otherItem.querySelector('.faq-answer');
+                        otherContent?.classList.remove('max-h-full', 'pb-2');
+                        otherContent?.classList.add('max-h-0', 'pb-0');
+                        otherIcon?.classList.remove('rotate-180');
+                        otherAnswer?.classList.remove('text-secondary');
+                        otherAnswer?.classList.add('text-white');
+                    }
+                });
+                
+                // Toggle el item actual
+                if (isOpen) {
+                    item.setAttribute('data-open', 'false');
+                    content?.classList.remove('max-h-full', 'pb-2');
+                    content?.classList.add('max-h-0', 'pb-0');
+                    icon?.classList.remove('rotate-180');
+                    answer?.classList.remove('text-secondary');
+                    answer?.classList.add('text-white');
+                } else {
+                    item.setAttribute('data-open', 'true');
+                    content?.classList.remove('max-h-0', 'pb-0');
+                    content?.classList.add('max-h-full', 'pb-2');
+                    icon?.classList.add('rotate-180');
+                    answer?.classList.remove('text-white');
+                    answer?.classList.add('text-secondary');
+                }
+            });
+        });
+    });
+</script>

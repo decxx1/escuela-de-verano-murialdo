@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+    --font-inter: "Inter Variable", sans-serif;
+    --font-atma: "Atma", system-ui;
+    --color-mint-500: oklch(0.72 0.11 178);
+    --color-primary:#04246e;
+    --color-secondary: #ffcf1b;
+    --color-tertiary: #e81d20;
+    --color-light: #fafafa;
+    --color-blueLight: #eff2ff;
+    --color-background: #192246;
+    --color-background2: #ffde59;
+    --color-header: #14337f;
+
+    --breakpoint-xs: 30rem;
+}
+
+@utility text-outline {
+  -webkit-text-stroke: 4px white;
+  paint-order: stroke fill;
+}
+@utility text-outline-2 {
+  -webkit-text-stroke: 8px white;
+  paint-order: stroke fill;
+}
+@utility text-outline-3 {
+  -webkit-text-stroke: 12px white;
+  paint-order: stroke fill;
+}
+@utility text-outline-4 {
+  -webkit-text-stroke: 16px white;
+  paint-order: stroke fill;
+}
+@utility text-outline-secondary {
+  -webkit-text-stroke: 4px var(--color-secondary);
+  paint-order: stroke fill;
+}
+@utility text-outline-secondary-2 {
+  -webkit-text-stroke: 8px var(--color-secondary);
+  paint-order: stroke fill;
+}
+@utility text-outline-secondary-3 {
+  -webkit-text-stroke: 12px var(--color-secondary);
+  paint-order: stroke fill;
+}
+@utility text-outline-secondary-4 {
+  -webkit-text-stroke: 16px var(--color-secondary);
+  paint-order: stroke fill;
+}
+@utility text-outline-tertiary {
+  -webkit-text-stroke: 4px var(--color-tertiary);
+  paint-order: stroke fill;
+}
+@utility text-outline-tertiary-2 {
+  -webkit-text-stroke: 8px var(--color-tertiary);
+  paint-order: stroke fill;
+}
+@utility text-outline-tertiary-3 {
+  -webkit-text-stroke: 12px var(--color-tertiary);
+  paint-order: stroke fill;
+}
+@utility text-outline-tertiary-4 {
+  -webkit-text-stroke: 16px var(--color-tertiary);
+  paint-order: stroke fill;
+}
+
+
+@plugin "@tailwindcss/typography";

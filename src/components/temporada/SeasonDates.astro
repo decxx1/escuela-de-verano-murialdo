@@ -1,0 +1,175 @@
+---
+import { fechaService, ajusteService } from '@/services/strapi';
+import type { Fecha, ArchivoFormulario } from '@/types/strapi';
+import { STRAPI_URL } from 'astro:env/server';
+
+// Obtener las fechas de temporada y estado de inscripción desde Strapi
+let fecha: Fecha | null = null;
+let inscripcionesAbiertas = false;
+let formularioInscripcion: ArchivoFormulario | null = null;
+let mostrarFechas = false;
+
+try {
+  const [fechaResponse, ajustesResponse] = await Promise.all([
+    fechaService.getFecha(),
+    ajusteService.getAjustes(),
+  ]);
+  
+  fecha = fechaResponse.data;
+  inscripcionesAbiertas = ajustesResponse.data.HabilitarInscripciones;
+  formularioInscripcion = ajustesResponse.data.FormularioInscripcion || null;
+  
+  // Verificar si debemos mostrar las fechas
+  if (fecha) {
+    const fechaFin = new Date(fecha.Fin);
+    const hoy = new Date();
+    
+    // Mostrar fechas solo si las inscripciones están abiertas Y la temporada no ha finalizado
+    mostrarFechas = inscripcionesAbiertas === true && hoy <= fechaFin;
+  }
+} catch (error) {
+  console.error('Error al obtener fechas de temporada:', error);
+}
+
+// Función para formatear fechas en formato legible
+function formatearFecha(fechaISO: string): string {
+  const fecha = new Date(fechaISO);
+  const dia = fecha.getDate();
+  const mes = fecha.getMonth() + 1;
+  return `${dia}/${mes}`;
+}
+---
+
+<section class="pb-8 pt-28 container mx-auto">
+    <section class="px-4 mx-auto max-w-7xl lg:px-6">
+        {mostrarFechas && fecha ? (
+            <>
+                <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Temporada {fecha.Temporada}</h2>
+                <p class="mt-2 text-white text-xl text-center mb-12">Fechas importantes de nuestra escuela de verano</p>
+                
+                <!-- Bento Grid Fijo -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Inicio de Temporada -->
+                    <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
+                        <h3 class="text-pri1265  mary text-outline-2 font-atma font-bold text-3xl mb-4">Inicio de temporada:</h3>
+                        <p class="text-white text-5xl font-bold">{formatearFecha(fecha.Inicio)}</p>
+                    </article>
+
+                    <!-- Fin de Temporada -->
+                    <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
+                        <h3 class="text-primary text-outline-2 font-atma font-bold text-3xl mb-4">Fin de temporada:</h3>
+                        <p class="text-white text-5xl font-bold">{formatearFecha(fecha.Fin)}</p>
+                    </article>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Horarios de Ingreso y Salida -->
+                    <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow transition-all duration-300">
+                        <div class="flex items-center gap-3 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Horarios de Ingreso y Salida</h3>
+                        </div>
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {fecha.IngresoSalida.map((horario) => (
+                                <div class="mb-6 last:mb-0">
+                                    <h4 class="text-secondary font-bold text-xl mb-3">{horario.Turno}</h4>
+                                    
+                                    <div class="mb-2">
+                                        <p class="text-white font-semibold text-base">Ingreso:</p>
+                                        <p class="text-white text-base">{horario.Ingreso}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-white font-semibold text-base">Salida:</p>
+                                        <p class="text-white text-base">{horario.Salida}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+                    </article>
+
+                    <!-- Horarios de Guardia -->
+                    <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow transition-all duration-300">
+                        <div class="flex items-center gap-3 mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Horarios de Guardia</h3>
+                        </div>
+                        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {fecha.HorariosGuardia.map((horario) => (
+                                <div class="mb-6 last:mb-0">
+                                    <h4 class="text-secondary font-bold text-xl mb-3">{horario.Turno}</h4>
+                                    
+                                    <div class="mb-2">
+                                        <p class="text-white font-semibold text-base">Entrada:</p>
+                                        <p class="text-white text-base">{horario.Ingreso}</p>
+                                    </div>
+                                    
+                                    <div>
+                                        <p class="text-white font-semibold text-base">Salida:</p>
+                                        <p class="text-white text-base">{horario.Salida}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+                    </article>
+                </div>
+
+                <!-- Fechas No Laborables -->
+                <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow transition-all duration-300 mb-6">
+                    <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl mb-4">Fechas que no se trabajan:</h3>
+                    <p class="text-white text-lg">{fecha.NoLaborables}</p>
+                </article>
+
+                <!-- Botón de Descarga del Formulario -->
+                {formularioInscripcion && (
+                    <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300 bg-linear-to-br from-secondary/10 to-transparent">
+                        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="flex-1 text-center md:text-left">
+                                <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl mb-2">Formulario de Inscripción</h3>
+                                <p class="text-white text-lg mb-2">Descargá el formulario para completar tu inscripción</p>
+                                <p class="text-white/70 text-sm">Archivo: {formularioInscripcion.name}</p>
+                            </div>
+                            <a 
+                                href={`${STRAPI_URL}${formularioInscripcion.url}`}
+                                download={formularioInscripcion.name}
+                                class="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-primary font-bold py-4 px-8 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/50 group"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                <span class="text-lg">Descargar Formulario</span>
+                            </a>
+                        </div>
+                    </article>
+                )}
+            </>
+        ) : (
+            <!-- Mensaje cuando no hay temporada activa -->
+            <div class="text-center py-20">
+                <div class="bg-light border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20 text-secondary mx-auto mb-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="16" y1="2" x2="16" y2="6"/>
+                        <line x1="8" y1="2" x2="8" y2="6"/>
+                        <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    <h2 class="font-atma font-bold text-primary text-3xl md:text-4xl mb-4">Temporada Finalizada</h2>
+                    <p class="text-primary text-xl mb-6">
+                        La temporada actual ha finalizado. Pronto anunciaremos las fechas para la próxima temporada.
+                    </p>
+                    <p class="text-primary/90 text-lg">
+                        Seguinos en nuestras redes sociales para estar al tanto de las novedades y ser el primero en enterarte cuando abran las inscripciones.
+                    </p>
+                </div>
+            </div>
+        )}
+    </section>
+</section>

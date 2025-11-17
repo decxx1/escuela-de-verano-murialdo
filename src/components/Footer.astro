@@ -1,0 +1,84 @@
+---
+import { contactoService } from '@/services/strapi';
+import type { Contacto } from '@/types/strapi';
+import Facebook from '@/assets/icons/contact/facebook.svg';
+import Instagram from '@/assets/icons/contact/instagram.svg';
+import Whatsapp from '@/assets/icons/contact/whatsapp.svg';
+import Phone from '@/assets/icons/contact/phone.svg';
+import Mapmarker from '@/assets/icons/contact/mapmarker.svg';
+import Email from '@/assets/icons/contact/email.svg';
+import { formatPhone } from '@/utils/formatters';
+
+// Obtener información de contacto desde Strapi durante el build
+let contacto: Contacto | null = null;
+try {
+  const response = await contactoService.getContacto();
+  contacto = response.data;
+} catch (error) {
+  console.error('Error al obtener información de contacto:', error);
+}
+---
+<footer class="container mx-auto py-20">
+    <div class="grid grid-cols-12 gap-4 sm:gap-6 lg:gap-8 mx-4">
+        <article class="border-2 border-secondary rounded-3xl px-4 py-4 col-span-12 md:col-span-4 lg:col-span-4 max-sm:max-h-80">
+            <div class="text-center text-primary p-8">
+                
+                <img loading="lazy" src="/images/logo/logo.png" alt="Logo Club Leonardo Murialdo" class="w-32 md:w-full h-auto" />
+                
+            </div>
+        </article>
+        <div class="col-span-12 md:col-span-8 lg:col-span-6 flex flex-col gap-4 sm:gap-6 lg:gap-8">
+            <article class="border-2 border-secondary rounded-3xl px-6 py-4">
+                <h3 class="text-primary text-outline font-extrabold text-xl md:text-lg lg:text-2xl mb-2 lg:mb-3">Horarios de atención:</h3> 
+                {contacto && (
+                    <ul>
+                        {contacto.Horarios.split('\n').map((horario) => (
+                            <li class="text-white text-lg md:text-md lg:text-xl">{horario}</li>
+                        ))}
+                    </ul>
+                )}
+            </article>
+            <article class="border-2 border-secondary rounded-3xl px-6 py-4">
+                {contacto && (
+                    <ul>
+                        <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
+                            <a href={`tel:${contacto.Telefono}`} target="_blank">
+                                <Phone class="mr-2 w-7 h-auto inline" />{formatPhone(contacto.Telefono)}
+                            </a>
+                        </li>
+                        <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
+                            <a href={`https://wa.me/${contacto.Whatsapp}`} target="_blank">
+                                <Whatsapp class="mr-2 w-7 h-auto inline" />{formatPhone(contacto.Whatsapp)}
+                            </a>
+                        </li>
+                        <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
+                            <a href={`mailto:${contacto.Email}`}>
+                                <Email class="mr-2 w-7 h-auto inline" />{contacto.Email}
+                            </a>
+                        </li>
+                        <li class="text-white text-md md:text-sm lg:text-lg hover:text-secondary">
+                            <a href={contacto.MapUrl} target="_blank">
+                                <Mapmarker class="mr-2 w-7 h-auto inline" />
+                                {contacto.Ubicacion}
+                            </a>
+                        </li>
+                    </ul>
+                )}
+            </article>
+        </div>
+        {contacto && (
+            <div class="col-span-12 lg:col-span-2 max-lg:max-h-44 border-2 border-secondary rounded-3xl px-4 py-4 flex flex-row lg:flex-col items-center justify-center gap-12">
+                <a href={contacto.Facebook} target="_blank">
+                    <Facebook class="w-16 lg:w-24 h-auto hover:drop-shadow hover:rotate-3" />
+                </a>
+                <a href={contacto.Instagram} target="_blank">
+                    <Instagram class="w-16 lg:w-24 h-auto hover:drop-shadow hover:rotate-3" />
+                </a>
+            </div>
+        )}
+    </div>
+    <p class="text-white text-center mt-16">
+        Diseñado por 
+        <a href="https://manejoweb.com.ar/" class="font-bold hover:text-secondary" target="_blank">Manejo Web</a>
+    </p>
+</footer>

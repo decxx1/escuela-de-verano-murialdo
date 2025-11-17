@@ -1,0 +1,183 @@
+---
+import { SITE_KEY, SECRET_KEY, ENDPOINT } from "astro:env/client";
+
+// Recibir email de contacto por props
+interface Props {
+  addressee: string;
+}
+
+const { addressee } = Astro.props;
+---
+
+<section class="py-8">
+    <article class="border-2 border-secondary rounded-3xl p-8">
+        <h3 class="text-primary text-outline-2 font-atma font-bold text-3xl md:text-4xl text-center mb-8">
+            Envíanos un mensaje
+        </h3>
+
+        <form id="contact-form" class="space-y-6">
+            <!-- Nombre y Email en fila -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="name" class="block text-white font-semibold text-lg mb-2">
+                        Tu nombre
+                    </label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        placeholder="Tu nombre"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-white/70 bg-transparent text-white placeholder-white/50 focus:border-secondary focus:outline-none transition-colors duration-200"
+                    />
+                </div>
+
+                <div>
+                    <label for="email" class="block text-white font-semibold text-lg mb-2">
+                        Tu E-mail
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        placeholder="Tu E-mail"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-white/70 bg-transparent text-white placeholder-white/50 focus:border-secondary focus:outline-none transition-colors duration-200"
+                    />
+                </div>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label for="phone" class="block text-white font-semibold text-lg mb-2">
+                    Teléfono
+                </label>
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    placeholder="Tu teléfono"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-white/70 bg-transparent text-white placeholder-white/50 focus:border-secondary focus:outline-none transition-colors duration-200"
+                />
+            </div>
+
+            <!-- Mensaje -->
+            <div>
+                <label for="message" class="block text-white font-semibold text-lg mb-2">
+                    Mensaje
+                </label>
+                <textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows="6"
+                    placeholder="Escribe tu mensaje aquí..."
+                    class="w-full px-4 py-3 rounded-xl border-2 border-white/70 bg-transparent text-white placeholder-white/50 focus:border-secondary focus:outline-none transition-colors duration-200 resize-none"
+                ></textarea>
+            </div>
+
+            <!-- Mensaje de estado -->
+            <div id="form-message" class="hidden p-4 rounded-xl text-center font-semibold"></div>
+
+            <!-- Botón de envío -->
+            <div class="text-center">
+                <button
+                    type="submit"
+                    id="submit-button"
+                    class="cursor-pointer bg-secondary hover:bg-secondary/90 text-tertiary font-atma font-bold text-xl md:text-2xl px-12 py-4 rounded-2xl transition-all duration-300 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Enviar Mensaje
+                </button>
+            </div>
+
+            <!-- reCAPTCHA badge info -->
+            <p class="text-white/70 text-sm text-center">
+                Este sitio está protegido por reCAPTCHA y se aplican la 
+                <a href="https://policies.google.com/privacy" target="_blank" class="text-secondary hover:underline">Política de Privacidad</a> y los 
+                <a href="https://policies.google.com/terms" target="_blank" class="text-secondary hover:underline">Términos de Servicio</a> de Google.
+            </p>
+        </form>
+    </article>
+</section>
+
+<script is:inline define:vars={{ SITE_KEY, addressee, SECRET_KEY, ENDPOINT }}>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('contact-form');
+        const submitButton = document.getElementById('submit-button');
+        const formMessage = document.getElementById('form-message');
+
+        if (!form || !submitButton || !formMessage) return;
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Deshabilitar botón
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+
+            // Ocultar mensaje anterior
+            formMessage.classList.add('hidden');
+
+            try {
+                // Obtener token de reCAPTCHA
+                const token = await grecaptcha.execute(SITE_KEY, { action: 'submit' });
+
+                // Obtener datos del formulario
+                const formData = new FormData(form);
+                const data = {
+                    secret_key: SECRET_KEY,
+                    addressee: addressee,
+                    asunto: 'Nuevo mensaje desde el formulario de contacto',
+                    token: token,
+                    name: formData.get('name'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    message: formData.get('message'),
+                };
+
+                // Enviar formulario
+                const response = await fetch(ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw errorData;
+                }
+                // Éxito
+                formMessage.textContent = '¡Mensaje enviado correctamente! Te responderemos pronto.';
+                formMessage.classList.remove('hidden', 'bg-red-500/20', 'border-red-500', 'text-red-500');
+                formMessage.classList.add('bg-green-500/20', 'border-2', 'border-green-500', 'text-green-500');
+                
+                // Limpiar formulario
+                form.reset();
+            } catch (error) {
+                // Error
+                //console.error('Error:', error);
+                //console.error(error)
+                if (error.errors) {
+                    const formErrors = error.errors;
+                    for (let field in formErrors) {
+                        if (formErrors.hasOwnProperty(field)) {
+                            formMessage.textContent = formErrors[field];
+                            break;
+                        }
+                    }
+                }else if(error.message){
+                    formMessage.textContent = error.message;
+                }
+                formMessage.classList.remove('hidden', 'bg-green-500/20', 'border-green-500', 'text-green-500');
+                formMessage.classList.add('bg-red-500/20', 'border-2', 'border-red-500', 'text-red-500');
+            } finally {
+                // Rehabilitar botón
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Mensaje';
+            }
+        });
+    });
+</script>

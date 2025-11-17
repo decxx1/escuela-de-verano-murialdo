@@ -1,0 +1,86 @@
+---
+import type { Contacto } from '@/types/strapi';
+import Phone from '@/assets/icons/contact/phone.svg';
+import Whatsapp from '@/assets/icons/contact/whatsapp.svg';
+import Mapmarker from '@/assets/icons/contact/mapmarker.svg';
+import { formatPhone } from '@/utils/formatters';
+
+// Recibir información de contacto por props
+interface Props {
+  contacto: Contacto | null;
+}
+
+const { contacto } = Astro.props;
+---
+
+{contacto && (
+    <section class="py-8">
+        <div class="grid grid-cols-1 gap-6">
+            <!-- Teléfonos -->
+            <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
+                <div class="flex items-center gap-3 mb-6">
+                    <Phone class="w-8 h-8 text-secondary" />
+                    <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Teléfonos:</h3>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-white font-bold text-lg mb-2">Para consultas:</h4>
+                        <a 
+                            href={`https://wa.me/${contacto.Whatsapp}`}
+                            target="_blank"
+                            class="text-white hover:text-secondary transition-colors duration-200 text-base md:text-lg flex items-center gap-2"
+                        >
+                            <Whatsapp class="w-5 h-5" />
+                            WhatsApp: {formatPhone(contacto.Whatsapp)}
+                        </a>
+                    </div>
+
+                    <div>
+                        <h4 class="text-white font-bold text-lg mb-2">Para inscripciones:</h4>
+                        <a 
+                            href={`tel:${contacto.Telefono}`}
+                            class="text-white hover:text-secondary transition-colors duration-200 text-base md:text-lg flex items-center gap-2"
+                        >
+                            <Phone class="w-5 h-5" />
+                            {formatPhone(contacto.Telefono)}
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Ubicación -->
+            <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
+                <div class="flex items-center gap-3 mb-6">
+                    <Mapmarker class="w-8 h-8 text-secondary" />
+                    <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Ubicación:</h3>
+                </div>
+
+                <a 
+                    href={contacto.MapUrl}
+                    target="_blank"
+                    class="text-white hover:text-secondary transition-colors duration-200 text-base md:text-lg block"
+                >
+                    {contacto.Ubicacion}
+                </a>
+            </article>
+
+            <!-- Horarios de Atención -->
+            <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
+                <div class="flex items-center gap-3 mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Horarios de atención:</h3>
+                </div>
+
+                <div class="space-y-2">
+                    {contacto.Horarios.split('\n').map((horario) => (
+                        <p class="text-white text-base md:text-lg">{horario}</p>
+                    ))}
+                </div>
+            </article>
+        </div>
+    </section>
+)}

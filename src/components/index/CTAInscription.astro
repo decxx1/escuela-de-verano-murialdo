@@ -1,0 +1,36 @@
+---
+import { ajusteService } from '@/services/strapi';
+
+// Obtener el estado de las inscripciones desde Strapi durante el build
+let inscripcionesAbiertas = false;
+
+try {
+  const response = await ajusteService.getAjustes();
+  inscripcionesAbiertas = response.data.HabilitarInscripciones === true;
+} catch (error) {
+  console.error('Error al obtener estado de inscripción:', error);
+  inscripcionesAbiertas = false;
+}
+---
+
+<section class="mx-4 lg:mx-10 my-32" id="inscripciones">
+    <div class="border-2 border-secondary rounded-3xl h-80 sm:h-64 text-center sm:text-left flex max-sm:flex-col justify-center sm:justify-between">
+        {inscripcionesAbiertas ? (
+            <>
+                <div class="sm:py-6 md:py-8 lg:py-12 px-8 sm:px-10">
+                    <h2 class="font-atma text-tertiary text-xl md:text-2xl lg:text-3xl xl:text-4xl font-extrabold mb-4 text-outline sm:text-outline-2 md:text-outline-3">¡Inscripciones abiertas, para todo el público!</h2>
+                    <p class="text-white text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">Tenemos promociones para los que se inscriban ahora, contactanos ¡te estamos esperando!</p>
+                </div>
+                <img src="/images/index/inscripciones-abiertas.webp" alt="Inscripciones Abiertas" class="w-96 h-auto sm:h-64 md:h-80 lg:h-96 px-8 -mb-48 xs:-mb-64 max-sm:mt-4" />
+            </>
+        ) : (
+            <>
+                <div class="sm:py-6 md:py-8 lg:py-12 px-8 sm:px-10">
+                    <h2 class="font-atma text-tertiary text-xl md:text-2xl lg:text-3xl xl:text-4xl font-extrabold mb-4 text-outline sm:text-outline-2 md:text-outline-3">Las inscripciones aun no están habilitadas</h2>
+                    <p class="text-white text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">Estamos preparando una temporada inolvidable. Seguinos en nuestras redes para estar al tanto de las novedades.</p>
+                </div>
+                <img src="/images/index/inscripciones-cerradas.webp" alt="Inscripciones Cerradas" class="w-96 h-auto sm:h-64 md:h-80 lg:h-96 px-8 -mb-48 xs:-mb-64 max-sm:mt-4" />
+            </>
+        )}
+    </div>
+</section>

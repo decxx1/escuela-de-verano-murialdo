@@ -1,0 +1,36 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import NewsGrid from '@/components/blog/NewsGrid.astro';
+import { noticiasService } from '@/services/strapi';
+import type { Noticia } from '@/types/strapi';
+
+const preloadImages = [
+	{
+		href:"/images/temporada.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+
+// Obtener noticias desde Strapi
+let noticias: Noticia[] = [];
+
+try {
+	const response = await noticiasService.getNoticias(1, 25);
+	noticias = response.data;
+} catch (error) {
+	console.error('Error al obtener noticias:', error);
+}
+---
+
+<Layout
+	title="Escuela de verano - Noticias"
+	canonical="https://escueladeveranomurialdo.com.ar/blog"
+	metaDescription="Mantente informado sobre las últimas novedades, eventos y actividades de la Escuela de Verano del Club Leonardo Murialdo. Estaremos publicando durante la temporada."
+	metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp"
+	preLoad={preloadImages}
+>
+	<Breadcrumb title="Noticias" img="/images/temporada.webp" />
+	<NewsGrid noticias={noticias} />
+</Layout>

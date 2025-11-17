@@ -1,0 +1,167 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { galeriasService } from '@/services/strapi';
+import type { Album } from '@/types/strapi';
+import { STRAPI_URL } from 'astro:env/server';
+
+
+// Función para formatear fecha
+function formatearFecha(fecha: string): string {
+  const date = new Date(fecha);
+  return date.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+// getStaticPaths para generar todas las páginas en build time
+export async function getStaticPaths() {
+  try {
+    // Obtener todos los álbumes (sin paginación para build)
+    const response = await galeriasService.getGalerias(1, 100);
+    
+    return response.data.map((album) => ({
+      params: { slug: album.documentId },
+      props: { album },
+    }));
+  } catch (error) {
+    console.error('Error al obtener álbumes para getStaticPaths:', error);
+    return [];
+  }
+}
+
+// Obtener el álbum de las props
+const { album } = Astro.props as { album: Album };
+
+const preloadImages = album.Fotos.length > 0 ? [
+  {
+    href: STRAPI_URL + album.Fotos[0].formats.small.url,
+    as: "image",
+    type: "image/jpeg",
+  }
+] : [];
+---
+
+<Layout
+  title={`${album.Nombre} - Galería - Escuela de verano Club Leonardo Murialdo`}
+  canonical={`https://escueladeveranomurialdo.com.ar/galeria/${album.documentId}`}
+  metaDescription={`Fotos del álbum ${album.Nombre} de la Escuela de Verano del Club Leonardo Murialdo. ${album.Fotos.length} fotos disponibles.`}
+  metaImg={album.Fotos.length > 0 ? STRAPI_URL + album.Fotos[0].url : "https://escueladeveranomurialdo.com.ar/images/index/escuela-de-verano.webp"}
+  preLoad={preloadImages}
+>
+  <Breadcrumb title="Galería" img="/images/index/escuela-de-verano.webp" />
+  
+  <section class="py-8 container mx-auto">
+    <article class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+      {/* Fecha */}
+      <time class="text-secondary text-base font-semibold mb-4 block" datetime={album.createdAt}>
+        {formatearFecha(album.createdAt)}
+      </time>
+
+      {/* Título del álbum */}
+      <h1 class="font-atma font-bold text-outline-4 text-tertiary text-4xl md:text-5xl lg:text-6xl mb-4">
+        {album.Nombre}
+      </h1>
+
+      {/* Contador de fotos */}
+      <p class="text-white text-lg mb-8">
+        {album.Fotos.length} {album.Fotos.length === 1 ? 'foto' : 'fotos'}
+      </p>
+
+      {/* Grid de fotos estilo bento/mosaico */}
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12" id="gallery">
+        {album.Fotos.map((foto, index) => (
+          <a
+            class="relative overflow-hidden rounded-2xl border-2 border-secondary hover:border-tertiary transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={`aspect-ratio: ${foto.width}/${foto.height};`}
+            data-pswp-width={foto.width}
+            data-pswp-height={foto.height}
+            data-pswp-src={STRAPI_URL + foto.url}
+          >
+            <img
+              src={STRAPI_URL + foto.formats.small.url}
+              alt={foto.name}
+              width={foto.formats.small.width}
+              height={foto.formats.small.height}
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            
+            {/* Overlay con icono de zoom */}
+            <div class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+                <line x1="11" y1="8" x2="11" y2="14"/>
+                <line x1="8" y1="11" x2="14" y2="11"/>
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {/* Botón volver */}
+      <div class="mt-12 pt-8 border-t-2 border-secondary/30">
+        <a
+          href="/galeria"
+          class="inline-flex items-center gap-2 text-secondary hover:text-tertiary font-semibold text-lg transition-colors duration-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver a Galería
+        </a>
+      </div>
+    </article>
+  </section>
+</Layout>
+
+<!-- PhotoSwipe Script -->
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+  import 'photoswipe/style.css';
+
+  // Inicializar PhotoSwipe cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: '#gallery',
+      children: 'a',
+      pswpModule: () => import('photoswipe'),
+      // Opciones de PhotoSwipe
+      bgOpacity: 0.95,
+      spacing: 0.1,
+      allowPanToNext: true,
+      zoom: true,
+      close: true,
+      arrowKeys: true,
+      returnFocus: true,
+      clickToCloseNonZoomable: true,
+      imageClickAction: 'zoom',
+      tapAction: 'toggle-controls',
+      doubleTapAction: 'zoom',
+      preloaderDelay: 0,
+      showHideAnimationType: 'zoom',
+    });
+    
+    lightbox.init();
+  });
+</script>
+
+<style>
+  /* Estilos personalizados para PhotoSwipe */
+  :global(.pswp) {
+    --pswp-bg: rgba(13, 27, 42, 0.95);
+    --pswp-icon-color: #FFC107;
+    --pswp-icon-color-secondary: #00BCD4;
+  }
+  
+  :global(.pswp__button) {
+    background-color: rgba(13, 27, 42, 0.8) !important;
+  }
+  
+  :global(.pswp__button:hover) {
+    background-color: rgba(13, 27, 42, 1) !important;
+  }
+</style>

@@ -1,0 +1,26 @@
+---
+interface Props {
+    title: string;
+    img: string;
+    filter?: boolean;
+}
+
+const { title, img, filter } = Astro.props;
+---
+<section class="container mx-auto mt-[150px] md:mt-[140px] lg:mt-[160px]">
+    <div 
+        class={`${filter ? "bg-black/40 bg-blend-multiply" : ""} bg-no-repeat bg-cover bg-center h-full w-full rounded-3xl`}
+        style={{ backgroundImage: `url(${img})` }}
+    >
+        
+        <div class="relative w-full">
+            <div class="flex justify-center relative h-[calc(70vh-14rem)] mx-5 sm:mx-10">
+                <h1 class="absolute top-5 left-1/2 -translate-x-1/2 z-10 text-primary text-outline-3 sm:text-outline-4 sm:pt-6 text-center font-extrabold  text-3xl md:text-5xl">
+                    {title}
+                </h1>
+            </div>
+            <img loading="lazy" src="/images/logo/logo.png" alt="Logo escuela de verano Murialdo" class="absolute bottom-5 left-12 drop-shadow-[0_0_6px_rgba(255,255,255,.8)] z-10 w-32 md:w-44 h-auto" />
+        </div>
+        
+    </div>
+</section>

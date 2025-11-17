@@ -1,0 +1,59 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ContactInfo from '@/components/contacto/ContactInfo.astro';
+import ContactForm from '@/components/contacto/ContactForm.astro';
+import ContactMap from '@/components/contacto/ContactMap.astro';
+import { contactoService } from '@/services/strapi';
+import type { Contacto } from '@/types/strapi';
+import { SITE_KEY } from "astro:env/client";
+
+const preloadImages = [
+	{
+		href:"/images/temporada.webp",
+		as: "image",
+		type: "image/webp",
+	}
+];
+
+// Obtener información de contacto una sola vez
+let contacto: Contacto | null = null;
+
+try {
+	const response = await contactoService.getContacto();
+	contacto = response.data;
+} catch (error) {
+	console.error('Error al obtener información de contacto:', error);
+}
+---
+
+<Layout
+	title="Escuela de verano - Contacto"
+	canonical="https://escueladeveranomurialdo.com.ar/contacto"
+	metaDescription="Contactá con la Escuela de Verano del Club Leonardo Murialdo. Encontrá nuestros teléfonos, ubicación, horarios de atención y envianos tu consulta."
+	metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp"
+	preLoad={preloadImages}
+>
+	<Breadcrumb title="Contacto" img="/images/temporada.webp" />
+	
+	<section class="container mx-auto py-8">
+		<section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+			<h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Contactanos</h2>
+			<p class="mt-2 text-white text-xl text-center mb-12">Estamos para ayudarte con cualquier consulta sobre nuestra escuela de verano</p>
+			
+			<!-- Bento Grid Layout -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+				<!-- Columna Izquierda: Información de Contacto -->
+				<ContactInfo contacto={contacto} />
+				
+				<!-- Columna Derecha: Formulario de Contacto -->
+				<ContactForm addressee={contacto?.Email || ''} />
+			</div>
+            <!-- Mapa sin columna -->
+            <ContactMap mapIframe={contacto?.MapIframe || ''} />
+		</section>
+	</section>
+</Layout>
+
+<!-- recaptcha v3 -->
+<script async src={'https://www.google.com/recaptcha/api.js?render=' + SITE_KEY}></script>

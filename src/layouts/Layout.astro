@@ -1,0 +1,162 @@
+---
+// Supports weights 100-900
+import "@/styles/global.css";
+import '@fontsource-variable/inter';
+import '@fontsource/atma/400.css';
+import '@fontsource/atma/500.css';
+import '@fontsource/atma/600.css';
+import '@fontsource/atma/700.css';
+import Footer from '@/components/Footer.astro';
+import Header from '@/components/Header.jsx';
+import FloatingButton from '@/components/FloatingButton.astro';
+
+import type { Preload } from "@/types/Preload"
+
+interface Props {
+	title: string;
+	canonical: string;
+	metaDescription: string;
+	metaImg: string;
+	preLoad?: Array<Preload>;
+}
+
+const {
+	title,
+	canonical,
+	metaDescription,
+	metaImg,
+	preLoad
+} = Astro.props;
+
+// Obtener la ruta actual
+const currentPath = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<!-- Favicons -->
+		<link rel="icon" href="/images/logo/favicon.png" type="image/png" />
+		<title>{title}</title>
+		
+		<!-- SEO -->
+		<link rel="canonical" href={canonical} />
+		<!-- GOOGLE -->
+		<meta name="description" content={metaDescription}/>
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Expires" content="Mon, 01 Jul 1970 00:00:00 GMT" />
+		<meta name="robots" content="index, follow" />
+		<meta name="googlebot" content="index, follow" />
+		 <!-- FACEBOOK OPEN GRAPH TAGS -->
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={metaDescription} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={metaImg} />
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:site" content="@" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={metaDescription} />
+		<meta name="twitter:url" content={canonical} />
+		<meta name="twitter:image" content={metaImg} />
+		<!-- preconnect para Google Recaptcha -->
+		<link rel="preconnect" href="https://www.google.com">
+		<link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+		{
+			preLoad?.map(({ href, as, type }) => (
+				<link rel="preload" {as} {href} {type} />
+			))
+		}
+	</head>
+	<body class="font-inter scrollbar scrollbar-w-3 scrollbar-thumb-rounded-[0.25rem] scrollbar-track-gray-200 scrollbar-thumb-gray-400">
+		<div class="fixed left-0 top-0 -z-10 h-full w-full">
+			<div class="relative h-full w-full bg-background">
+				<div class="absolute left-0 right-0 top-[-10%] h-[1000px] w-[1000px] rounded-full bg-radial-[circle_400px_at_50%_300px] from-[#253966] to-background">
+				</div>
+			</div>
+		</div>
+		<Header client:load currentPath={currentPath} />
+		<main>
+			<slot />
+		</main>
+		<Footer />
+		<FloatingButton />
+	</body>
+</html>
+
+
+<style is:global>
+
+/*recaptcha*/
+.grecaptcha-badge {
+	width: 70px !important;
+	overflow: hidden !important;
+	transition: all 0.3s ease !important;
+	left: 4px !important;
+	z-index:100;
+}
+
+.grecaptcha-badge:hover {
+	width: 256px !important;
+}
+/*whatsapp button*/
+
+.float-button {
+	text-decoration: none;
+    position: fixed;
+	padding: 10px;
+	padding-right: 10px;
+	bottom: 30px;
+	right: 30px;
+	color: #fff;
+	background-color:#25D366;
+	border-radius: 100%;
+	z-index: 100;
+	font-family: Arial;
+	font-size: 24px;
+	animation: whatsapp-animation 0.5s ease-in-out;
+	box-shadow: 1px 2px 5px 2px rgba(30,30,30,0.3);
+	transition:all 0.3s ease-out;
+}
+
+.float-button:hover {
+	background-color: #128C7E;
+	color: #fff;
+    text-decoration: none;
+}
+
+.whbutton {
+	font-size: 22px !important;
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+@keyframes whatsapp-animation {
+	from {
+		opacity: 0%;
+	}
+
+	to {
+		opacity: 100%
+	}
+}
+
+@media screen and (max-width: 545px) {
+	span {
+		display: none;
+	}
+
+	.float-button {
+		bottom: 15px;
+		right: 15px;
+		border-radius: 20px 20px 5px 20px;
+	}
+	.whbutton {
+		font-size: 32px !important;
+	}
+}
+</style>
+

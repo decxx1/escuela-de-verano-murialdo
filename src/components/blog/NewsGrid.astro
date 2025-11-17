@@ -1,0 +1,105 @@
+---
+import type { Noticia } from '@/types/strapi';
+import { STRAPI_URL } from 'astro:env/server';
+
+interface Props {
+  noticias: Noticia[];
+}
+
+const { noticias } = Astro.props;
+
+
+// Función para formatear fecha
+function formatearFecha(fecha: string): string {
+  const date = new Date(fecha);
+  return date.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+// Función para truncar texto
+function truncarTexto(texto: string, maxLength: number = 150): string {
+  if (texto.length <= maxLength) return texto;
+  return texto.substring(0, maxLength).trim() + '...';
+}
+---
+
+<section class="py-8 container mx-auto">
+    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+        <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Noticias</h2>
+        <p class="mt-2 text-white text-xl text-center mb-12">Mantente informado sobre las últimas novedades de nuestra escuela de verano</p>
+        
+        <!-- Grid de Noticias -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {noticias.map((noticia) => (
+                <article class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col">
+                    {/* Imagen */}
+                    <a href={`/blog/${noticia.documentId}`} class="block">
+                        <div class="h-64 w-full relative overflow-hidden">
+                            <img
+                                src={STRAPI_URL + noticia.Imagen.formats.small.url}
+                                alt={noticia.Titulo}
+                                width={noticia.Imagen.formats.small.width}
+                                height={noticia.Imagen.formats.small.height}
+                                class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                loading="lazy"
+                            />
+                        </div>
+                    </a>
+
+                    {/* Contenido */}
+                    <div class="p-6 flex flex-col flex-1">
+                        {/* Fecha */}
+                        <time class="text-secondary text-sm font-semibold mb-2" datetime={noticia.createdAt}>
+                            {formatearFecha(noticia.createdAt)}
+                        </time>
+
+                        {/* Título */}
+                        <a href={`/blog/${noticia.documentId}`} class="block mb-3">
+                            <h3 class="text-tertiary text-outline-secondary-2 font-atma font-semibold text-2xl md:text-3xl hover:text-primary transition-colors duration-200">
+                                {noticia.Titulo}
+                            </h3>
+                        </a>
+
+                        {/* Subtítulo (opcional) */}
+                        {noticia.Subtitulo && (
+                            <p class="text-white font-semibold text-base mb-3">
+                                {noticia.Subtitulo}
+                            </p>
+                        )}
+
+                        {/* Preview del texto */}
+                        <p class="text-white/80 text-sm mb-4 flex-1">
+                            {truncarTexto(noticia.Texto.replace(/[#*\-\[\]]/g, ''))}
+                        </p>
+
+                        {/* Botón Leer más */}
+                        <a
+                            href={`/blog/${noticia.documentId}`}
+                            class="inline-flex items-center gap-2 text-secondary hover:text-tertiary font-semibold transition-colors duration-200 mt-auto"
+                        >
+                            Leer más
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </article>
+            ))}
+        </div>
+
+        {/* Mensaje si no hay noticias */}
+        {noticias.length === 0 && (
+            <div class="text-center py-20">
+                <div class="border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
+                    <h3 class="font-atma font-bold text-primary text-outline-2 text-3xl md:text-4xl mb-4">No hay noticias disponibles</h3>
+                    <p class="text-white text-xl">
+                        Pronto publicaremos novedades sobre nuestra escuela de verano.
+                    </p>
+                </div>
+            </div>
+        )}
+    </section>
+</section>

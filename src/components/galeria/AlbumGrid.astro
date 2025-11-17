@@ -1,0 +1,107 @@
+---
+import type { Album } from '@/types/strapi';
+import { STRAPI_URL } from 'astro:env/server';
+
+interface Props {
+  albumes: Album[];
+}
+
+const { albumes } = Astro.props;
+
+
+// Función para formatear fecha
+function formatearFecha(fecha: string): string {
+  const date = new Date(fecha);
+  return date.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+---
+
+<section class="py-8 container mx-auto">
+    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+        <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Galería de Fotos</h2>
+        <p class="mt-2 text-white text-xl text-center mb-12">Revive los mejores momentos de nuestra escuela de verano</p>
+        
+        <!-- Grid de Álbumes -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {albumes.map((album) => {
+                // Obtener la primera foto como portada
+                const portada = album.Fotos[0];
+                const totalFotos = album.Fotos.length;
+                
+                return (
+                    <article class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col">
+                        {/* Imagen de portada */}
+                        <a href={`/galeria/${album.documentId}`} class="block relative">
+                            <div class="h-72 w-full relative overflow-hidden">
+                                {portada && (
+                                    <img
+                                        src={STRAPI_URL + portada.formats.small.url}
+                                        alt={album.Nombre}
+                                        width={portada.formats.small.width}
+                                        height={portada.formats.small.height}
+                                        class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                                        loading="lazy"
+                                    />
+                                )}
+                                
+                                {/* Overlay con contador de fotos */}
+                                <div class="absolute inset-0 bg-linear-to-t from-primary/90 via-primary/30 to-transparent flex items-end justify-center pb-6">
+                                    <div class="flex items-center gap-2 text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                                            <polyline points="21 15 16 10 5 21"/>
+                                        </svg>
+                                        <span class="text-lg font-semibold">{totalFotos} {totalFotos === 1 ? 'foto' : 'fotos'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+
+                        {/* Contenido */}
+                        <div class="p-6 flex flex-col flex-1">
+                            {/* Fecha */}
+                            <time class="text-secondary text-sm font-semibold mb-2" datetime={album.createdAt}>
+                                {formatearFecha(album.createdAt)}
+                            </time>
+
+                            {/* Nombre del álbum */}
+                            <a href={`/galeria/${album.documentId}`} class="block mb-4">
+                                <h3 class="text-tertiary text-outline-secondary-2 font-atma font-semibold text-2xl md:text-3xl hover:text-secondary transition-colors duration-200">
+                                    {album.Nombre}
+                                </h3>
+                            </a>
+
+                            {/* Botón Ver álbum */}
+                            <a
+                                href={`/galeria/${album.documentId}`}
+                                class="inline-flex items-center gap-2 text-secondary hover:text-tertiary font-semibold transition-colors duration-200 mt-auto"
+                            >
+                                Ver álbum
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                );
+            })}
+        </div>
+
+        {/* Mensaje si no hay álbumes */}
+        {albumes.length === 0 && (
+            <div class="text-center py-20">
+                <div class="border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
+                    <h3 class="font-atma font-bold text-primary text-outline-2 text-3xl md:text-4xl mb-4">No hay álbumes disponibles</h3>
+                    <p class="text-white text-xl">
+                        Pronto publicaremos fotos de nuestra escuela de verano.
+                    </p>
+                </div>
+            </div>
+        )}
+    </section>
+</section>

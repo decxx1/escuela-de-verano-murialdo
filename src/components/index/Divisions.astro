@@ -1,0 +1,51 @@
+---
+import { divisionesService } from '@/services/strapi';
+import type { DivisionEdad } from '@/types/strapi';
+
+// Obtener las divisiones desde Strapi durante el build
+let divisiones: DivisionEdad[] = [];
+try {
+  const response = await divisionesService.getDivisiones();
+  divisiones = response.data;
+} catch (error) {
+  console.error('Error al obtener divisiones:', error);
+}
+---
+
+<section class="py-8 container mx-auto" id="edades">
+    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+        <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center">Divisiones por edades</h2>
+        <p class="mt-2 text-white text-xl text-center">Destinado para chicos y chicas entre 3 y 14 años. Para los dos turnos las divisiones de los chicos en los grupos tendrá flexibilidad para hacer todas las modificaciones que resulten necesarias para los padres.</p>
+    </section>
+    <section class="text-primary border-2 border-secondary rounded-3xl px-6 py-8">
+        {divisiones.map((division) => (
+            <div class={division.id !== divisiones[0].id ? 'mt-4' : ''}>
+                <h3 class="font-atma font-bold text-2xl text-primary text-outline text-center py-2">
+                    {division.Titulo}
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-primary text-white">
+                                {division.Columna.map((columna) => (
+                                    <th class="border border-gray-300 px-4 py-2">
+                                        {columna.Division}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="text-white">
+                                {division.Columna.map((columna) => (
+                                    <td class="border border-gray-300 px-4 py-2 font-medium">
+                                        {columna.Edades}
+                                    </td>
+                                ))}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        ))}
+    </section>
+</section>

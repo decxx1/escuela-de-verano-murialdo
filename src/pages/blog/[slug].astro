@@ -1,0 +1,112 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { noticiasService } from '@/services/strapi';
+import type { Noticia } from '@/types/strapi';
+import { marked } from 'marked';
+import { STRAPI_URL } from 'astro:env/server';
+
+
+// Función para formatear fecha
+function formatearFecha(fecha: string): string {
+  const date = new Date(fecha);
+  return date.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
+
+// getStaticPaths para generar todas las páginas en build time
+export async function getStaticPaths() {
+  try {
+    // Obtener todas las noticias (sin paginación para build)
+    const response = await noticiasService.getNoticias(1, 100);
+    
+    return response.data.map((noticia) => ({
+      params: { slug: noticia.documentId },
+      props: { noticia },
+    }));
+  } catch (error) {
+    console.error('Error al obtener noticias para getStaticPaths:', error);
+    return [];
+  }
+}
+
+// Obtener la noticia de las props
+const { noticia } = Astro.props as { noticia: Noticia };
+
+const preloadImages = [
+  {
+    href: STRAPI_URL + noticia.Imagen.url,
+    as: "image",
+    type: "image/jpeg",
+  }
+];
+---
+
+<Layout
+  title={`${noticia.Titulo} - Escuela de verano Club Leonardo Murialdo`}
+  canonical={`https://escueladeveranomurialdo.com.ar/blog/${noticia.documentId}`}
+  metaDescription={noticia.Subtitulo || noticia.Texto.substring(0, 155)}
+  metaImg={STRAPI_URL + noticia.Imagen.url}
+  preLoad={preloadImages}
+>
+  <section class="max-sm:pt-44 max-sm:pb-20 sm:py-20 container mx-auto">
+    <article class="px-4 mx-auto max-w-4xl sm:py-20 lg:px-6">
+      {/* Fecha */}
+      <time class="text-secondary text-base font-semibold mb-4 block" datetime={noticia.createdAt}>
+        {formatearFecha(noticia.createdAt)}
+      </time>
+
+      {/* Título */}
+      <h1 class="font-atma font-bold text-outline-4 text-tertiary text-4xl md:text-5xl lg:text-6xl mb-6">
+        {noticia.Titulo}
+      </h1>
+
+      {/* Subtítulo (opcional) */}
+      {noticia.Subtitulo && (
+        <p class="text-white text-xl md:text-2xl font-semibold mb-8">
+          {noticia.Subtitulo}
+        </p>
+      )}
+
+      {/* Imagen principal */}
+      <div class="mb-8 rounded-3xl overflow-hidden border-2 border-secondary">
+        <img
+          src={STRAPI_URL + noticia.Imagen.url}
+          alt={noticia.Titulo}
+          class="w-full h-auto"
+          loading="eager"
+        />
+      </div>
+
+      {/* Contenido con Markdown */}
+      <div 
+        class="prose prose-lg max-w-none
+               prose-headings:text-tertiary prose-headings:text-outline-secondary-2 prose-headings:font-atma prose-headings:font-bold
+               prose-p:text-white prose-p:text-lg prose-p:leading-relaxed
+               prose-strong:text-secondary prose-strong:font-bold
+               prose-a:text-secondary prose-a:hover:text-tertiary prose-a:transition-colors
+               prose-ul:text-white prose-li:text-white prose-li:text-lg
+               prose-ol:text-white
+               prose-blockquote:text-white prose-blockquote:border-l-secondary
+               prose-code:text-secondary prose-code:bg-primary/20 prose-code:px-2 prose-code:py-1 prose-code:rounded
+               prose-pre:bg-primary/20 prose-pre:border-2 prose-pre:border-secondary"
+        set:html={marked.parse(noticia.Texto)}
+      />
+
+      {/* Botón volver */}
+      <div class="mt-12 pt-8 border-t-2 border-secondary/30">
+        <a
+          href="/blog"
+          class="inline-flex items-center gap-2 text-secondary hover:text-tertiary font-semibold text-lg transition-colors duration-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Volver a Noticias
+        </a>
+      </div>
+    </article>
+  </section>
+</Layout>

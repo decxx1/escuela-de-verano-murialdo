@@ -1,0 +1,187 @@
+---
+import { precioService, ajusteService } from '@/services/strapi';
+import type { Turno } from '@/types/strapi';
+
+// Obtener los precios desde Strapi durante el build
+let turnos: Turno[] = [];
+let inscripcionesAbiertas = false;
+let preciosHabilitados = false;
+let mostrarPrecios = false;
+try {
+    const [preciosResponse, ajustesResponse] = await Promise.all([
+    precioService.getPrecios(),
+    ajusteService.getAjustes(),
+  ]);
+  turnos = preciosResponse.data;
+  inscripcionesAbiertas = ajustesResponse.data.HabilitarInscripciones;
+  preciosHabilitados = ajustesResponse.data.HabilitarPrecios;
+  
+  // Mostrar precios solo si las inscripciones están abiertas Y los precios están habilitados
+  mostrarPrecios = inscripcionesAbiertas === true && preciosHabilitados === true && turnos.length > 0;
+} catch (error) {
+  console.error('Error al obtener precios:', error);
+}
+
+// Función para formatear precios
+function formatearPrecio(precio: number): string {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(precio);
+}
+---
+
+<section class="py-8 container mx-auto">
+    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
+        {mostrarPrecios ? (
+            <>
+                <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Precios</h2>
+                <p class="mt-2 text-white text-xl text-center mb-12">Conocé los precios según tu condición y turno elegido</p>
+                
+                <!-- Tabs Container -->
+                <div class="bg-transparent rounded-3xl overflow-hidden">
+                    <!-- Tab Headers -->
+                    <div class="flex flex-wrap gap-2 mb-6 justify-center">
+                        {turnos.map((turno, index) => (
+                            <button
+                                class={`tab-button cursor-pointer px-8 py-4 rounded-2xl font-atma font-bold text-xl md:text-2xl transition-all duration-300 border-2 ${
+                                    index === 0 
+                                        ? 'bg-secondary border-secondary text-primary' 
+                                        : 'bg-transparent border-secondary text-white hover:bg-secondary/20'
+                                }`}
+                                data-tab={`tab-${index}`}
+                                data-index={index}
+                            >
+                                {turno.Turno}
+                            </button>
+                        ))}
+                    </div>
+
+                    <!-- Tab Contents -->
+                    <div class="tab-contents">
+                        {turnos.map((turno, turnoIndex) => (
+                            <div
+                                class={`tab-content ${turnoIndex === 0 ? 'active' : ''}`}
+                                data-tab={`tab-${turnoIndex}`}
+                            >
+                                <!-- Grid de Condiciones -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {turno.Condiciones.map((condicion) => (
+                                        <article class="border-2 border-secondary rounded-3xl p-6 hover:shadow-secondary hover:shadow transition-all duration-300 flex flex-col">
+                                            {/* Header de la Condición */}
+                                            <div class="mb-6 pb-4 border-b-2 border-secondary/30">
+                                                <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl text-center">
+                                                    {condicion.Condicion}
+                                                </h3>
+                                            </div>
+
+                                            {/* Lista de Precios */}
+                                            <div class="space-y-4 flex-1">
+                                                {condicion.precios.map((precioDetalle) => (
+                                                    <div class="bg-primary/5 rounded-xl p-4 hover:bg-primary/10 transition-colors duration-200">
+                                                        <div class="flex justify-between items-center">
+                                                            <div>
+                                                                <p class="text-white font-semibold text-base md:text-lg">
+                                                                    {precioDetalle.MedioDePago}
+                                                                </p>
+                                                            </div>
+                                                            <div>
+                                                                <p class="text-secondary font-bold text-xl md:text-2xl">
+                                                                    {formatearPrecio(precioDetalle.Precio)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <!-- Nota informativa -->
+                <div class="mt-8 border-2 border-secondary/50 rounded-2xl p-6 bg-primary/5">
+                    <p class="text-white text-center text-sm md:text-base">
+                        <span class="font-bold text-secondary">Nota:</span> Los precios están sujetos a cambios. 
+                        Para más información sobre descuentos por hermanos o promociones especiales, contactanos directamente.
+                    </p>
+                </div>
+            </>
+        ) : (
+            <!-- Mensaje cuando no hay precios -->
+            <div class="text-center py-20">
+                <div class="bg-light border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
+                    <h2 class="font-atma font-bold text-primary text-3xl md:text-4xl mb-4">Precios no disponibles</h2>
+                    <p class="text-primary/70 text-xl">
+                        Los precios de la temporada serán anunciados próximamente.
+                    </p>
+                </div>
+            </div>
+        )}
+    </section>
+</section>
+
+<script>
+    // Script para manejar las pestañas
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+                const index = button.getAttribute('data-index');
+
+                // Remover clases activas de todos los botones
+                tabButtons.forEach((btn) => {
+                    btn.classList.remove('bg-secondary', 'border-secondary', 'text-primary');
+                    btn.classList.add('bg-transparent', 'border-secondary', 'text-white');
+                });
+
+                // Agregar clases activas al botón clickeado
+                button.classList.remove('bg-transparent', 'text-white');
+                button.classList.add('bg-secondary', 'text-primary');
+
+                // Ocultar todos los contenidos
+                tabContents.forEach((content) => {
+                    content.classList.remove('active');
+                });
+
+                // Mostrar el contenido correspondiente
+                const targetContent = document.querySelector(`.tab-content[data-tab="${targetTab}"]`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+
+</style>
