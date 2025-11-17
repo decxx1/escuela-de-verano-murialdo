@@ -1,5 +1,6 @@
 ---
 import type { Album } from '@/types/strapi';
+import { STRAPI_URL } from 'astro:env/server';
 
 interface Props {
   albumes: Album[];
@@ -38,7 +39,7 @@ function formatearFecha(fecha: string): string {
                             <div class="h-72 w-full relative overflow-hidden">
                                 {portada && (
                                     <img
-                                        src={portada.formats.small.url}
+                                        src={STRAPI_URL + portada.formats.small.url}
                                         alt={album.Nombre}
                                         width={portada.formats.small.width}
                                         height={portada.formats.small.height}

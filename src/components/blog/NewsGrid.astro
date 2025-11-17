@@ -1,6 +1,5 @@
 ---
 import type { Noticia } from '@/types/strapi';
-import { STRAPI_URL } from 'astro:env/server';
 
 interface Props {
   noticias: Noticia[];
@@ -39,7 +38,7 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
                     <a href={`/blog/${noticia.documentId}`} class="block">
                         <div class="h-64 w-full relative overflow-hidden">
                             <img
-                                src={STRAPI_URL + noticia.Imagen.formats.small.url}
+                                src={noticia.Imagen.formats.small.url}
                                 alt={noticia.Titulo}
                                 width={noticia.Imagen.formats.small.width}
                                 height={noticia.Imagen.formats.small.height}
