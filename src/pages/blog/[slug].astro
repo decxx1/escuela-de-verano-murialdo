@@ -3,7 +3,6 @@ import Layout from '@/layouts/Layout.astro';
 import { noticiasService } from '@/services/strapi';
 import type { Noticia } from '@/types/strapi';
 import { marked } from 'marked';
-import { STRAPI_URL } from 'astro:env/server';
 
 
 // Función para formatear fecha
@@ -37,7 +36,7 @@ const { noticia } = Astro.props as { noticia: Noticia };
 
 const preloadImages = [
   {
-    href: STRAPI_URL + noticia.Imagen.url,
+    href: noticia.Imagen.url,
     as: "image",
     type: "image/jpeg",
   }
@@ -48,7 +47,7 @@ const preloadImages = [
   title={`${noticia.Titulo} - Escuela de verano Club Leonardo Murialdo`}
   canonical={`https://escueladeveranomurialdo.com.ar/blog/${noticia.documentId}`}
   metaDescription={noticia.Subtitulo || noticia.Texto.substring(0, 155)}
-  metaImg={STRAPI_URL + noticia.Imagen.url}
+  metaImg={noticia.Imagen.url}
   preLoad={preloadImages}
 >
   <section class="max-sm:pt-44 max-sm:pb-20 sm:py-20 container mx-auto">
@@ -73,7 +72,7 @@ const preloadImages = [
       {/* Imagen principal */}
       <div class="mb-8 rounded-3xl overflow-hidden border-2 border-secondary">
         <img
-          src={STRAPI_URL + noticia.Imagen.url}
+          src={noticia.Imagen.url}
           alt={noticia.Titulo}
           class="w-full h-auto"
           loading="eager"
