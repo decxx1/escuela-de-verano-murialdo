@@ -1,9 +1,9 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import Breadcrumb from '@/components/Breadcrumb.astro';
+import Pagination from '@/components/Pagination.astro';
 import { galeriasService } from '@/services/strapi';
 import type { Album } from '@/types/strapi';
-
+import { STRAPI_URL } from 'astro:env/server';
 
 // Función para formatear fecha
 function formatearFecha(fecha: string): string {
@@ -15,15 +15,19 @@ function formatearFecha(fecha: string): string {
   });
 }
 
+const isLocalHost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
+const baseUrl = isLocalHost ? STRAPI_URL : '';
+
 // getStaticPaths para generar todas las páginas en build time
 export async function getStaticPaths() {
   try {
-    // Obtener todos los álbumes (sin paginación para build)
-    const response = await galeriasService.getGalerias(1, 100);
+    // OPTIMIZACIÓN: Obtener todos los álbumes para generar páginas estáticas
+    // Si tienes más de 500 álbumes, considera usar SSR (output: 'server') en astro.config
+    const response = await galeriasService.getGalerias(1, 500);
     
     return response.data.map((album) => ({
       params: { slug: album.documentId },
-      props: { album },
+      props: { albumId: album.documentId },
     }));
   } catch (error) {
     console.error('Error al obtener álbumes para getStaticPaths:', error);
@@ -31,12 +35,39 @@ export async function getStaticPaths() {
   }
 }
 
-// Obtener el álbum de las props
-const { album } = Astro.props as { album: Album };
+// Obtener parámetros
+const { slug } = Astro.params;
+const { albumId } = Astro.props as { albumId: string };
 
-const preloadImages = album.Fotos.length > 0 ? [
+const pageSize = 10;
+
+// OPTIMIZACIÓN: Obtener el álbum completo
+// NOTA: Esto carga TODAS las fotos del álbum en el HTML
+// Para álbumes con >100 fotos, considera:
+// 1. Usar SSR con paginación real de API
+// 2. Implementar lazy loading con Intersection Observer
+// 3. Cargar fotos bajo demanda con fetch
+let album: Album;
+let todasLasFotos: any[] = [];
+let totalFotos = 0;
+let totalPages = 1;
+
+try {
+  const response = await galeriasService.getAlbumByDocumentId(albumId);
+  album = response.data;
+  todasLasFotos = album.Fotos || [];
+  
+  // Calcular paginación
+  totalFotos = todasLasFotos.length;
+  totalPages = Math.ceil(totalFotos / pageSize);
+} catch (error) {
+  console.error('Error al obtener álbum:', error);
+  return Astro.redirect('/galeria');
+}
+
+const preloadImages = todasLasFotos.length > 0 ? [
   {
-    href: album.Fotos[0].formats.small.url,
+    href: baseUrl + todasLasFotos[0].formats.small.url,
     as: "image",
     type: "image/jpeg",
   }
@@ -47,12 +78,10 @@ const preloadImages = album.Fotos.length > 0 ? [
   title={`${album.Nombre} - Galería - Escuela de verano Club Leonardo Murialdo`}
   canonical={`https://escueladeveranomurialdo.com.ar/galeria/${album.documentId}`}
   metaDescription={`Fotos del álbum ${album.Nombre} de la Escuela de Verano del Club Leonardo Murialdo. ${album.Fotos.length} fotos disponibles.`}
-  metaImg={album.Fotos.length > 0 ? album.Fotos[0].url : "https://escueladeveranomurialdo.com.ar/images/index/escuela-de-verano.webp"}
+  metaImg={todasLasFotos.length > 0 ? baseUrl + todasLasFotos[0].url : "https://escueladeveranomurialdo.com.ar/images/index/escuela-de-verano.webp"}
   preLoad={preloadImages}
 >
-  <Breadcrumb title="Galería" img="/images/index/escuela-de-verano.webp" />
-  
-  <section class="py-8 container mx-auto">
+  <section class="pt-44 pb-20 sm:pb-20 sm:pt-36 container mx-auto">
     <article class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
       {/* Fecha */}
       <time class="text-secondary text-base font-semibold mb-4 block" datetime={album.createdAt}>
@@ -66,24 +95,30 @@ const preloadImages = album.Fotos.length > 0 ? [
 
       {/* Contador de fotos */}
       <p class="text-white text-lg mb-8">
-        {album.Fotos.length} {album.Fotos.length === 1 ? 'foto' : 'fotos'}
+        <span id="foto-count">{totalFotos}</span> {totalFotos === 1 ? 'foto' : 'fotos'} en total
+        {totalPages > 1 && (
+          <span class="text-secondary ml-2" id="page-indicator">
+            (Página <span id="current-page">1</span> de {totalPages})
+          </span>
+        )}
       </p>
 
       {/* Grid de fotos estilo bento/mosaico */}
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12" id="gallery">
-        {album.Fotos.map((foto, index) => (
+        {todasLasFotos.map((foto, index) => (
           <a
             class="relative overflow-hidden rounded-2xl border-2 border-secondary hover:border-tertiary transition-all duration-300 hover:scale-105 cursor-pointer group"
-            style={`aspect-ratio: ${foto.width}/${foto.height};`}
+            style={`aspect-ratio: ${foto.width}/${foto.height}; ${index >= pageSize ? 'display: none;' : ''}`}
             data-pswp-width={foto.width}
             data-pswp-height={foto.height}
-            data-pswp-src={foto.url}
+            data-pswp-src={baseUrl + foto.url}
+            data-page={Math.floor(index / pageSize) + 1}
           >
             <img
-              src={foto.formats.small.url}
+              src={baseUrl + foto.formats?.small?.url || '../images/logo/logo.png'}
               alt={foto.name}
-              width={foto.formats.small.width}
-              height={foto.formats.small.height}
+              width={foto.formats?.small?.width || 500}
+              height={foto.formats?.small?.height || 363}
               class="w-full h-full object-cover"
               loading="lazy"
             />
@@ -101,6 +136,11 @@ const preloadImages = album.Fotos.length > 0 ? [
         ))}
       </div>
 
+      {/* Paginación */}
+      {totalPages > 1 && (
+        <Pagination totalPages={totalPages} />
+      )}
+
       {/* Botón volver */}
       <div class="mt-12 pt-8 border-t-2 border-secondary/30">
         <a
@@ -117,16 +157,95 @@ const preloadImages = album.Fotos.length > 0 ? [
   </section>
 </Layout>
 
-<!-- PhotoSwipe Script -->
+<!-- Paginación y PhotoSwipe Script -->
 <script>
   import PhotoSwipeLightbox from 'photoswipe/lightbox';
   import 'photoswipe/style.css';
 
-  // Inicializar PhotoSwipe cuando el DOM esté listo
+  // Inicializar cuando el DOM esté listo
   document.addEventListener('DOMContentLoaded', () => {
+    // Variables de paginación
+    let currentPage = 1;
+    const pageSize = 10;
+    const gallery = document.getElementById('gallery');
+    const photos = gallery?.querySelectorAll('a[data-page]') || [];
+    const totalPages = Math.max(...Array.from(photos).map(p => parseInt(p.getAttribute('data-page') || '1')));
+    
+    // Elementos del DOM
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageButtons = document.querySelectorAll('.page-btn');
+    const currentPageSpan = document.getElementById('current-page');
+    const currentPageMobile = document.getElementById('current-page-mobile');
+
+    // Función para mostrar página
+    function showPage(page: number) {
+      currentPage = page;
+      
+      // Actualizar visibilidad de fotos
+      photos.forEach((photo) => {
+        const photoPage = parseInt(photo.getAttribute('data-page') || '1');
+        if (photoPage === currentPage) {
+          (photo as HTMLElement).style.display = '';
+        } else {
+          (photo as HTMLElement).style.display = 'none';
+        }
+      });
+
+      // Actualizar botones de paginación
+      if (prevBtn) {
+        (prevBtn as HTMLButtonElement).disabled = currentPage === 1;
+      }
+      if (nextBtn) {
+        (nextBtn as HTMLButtonElement).disabled = currentPage === totalPages;
+      }
+
+      // Actualizar indicador de página (desktop)
+      if (currentPageSpan) {
+        currentPageSpan.textContent = currentPage.toString();
+      }
+
+      // Actualizar indicador de página (móvil)
+      if (currentPageMobile) {
+        currentPageMobile.textContent = currentPage.toString();
+      }
+
+      // Actualizar display de paginación (números de página dinámicos)
+      if ((window as any).updatePaginationDisplay) {
+        (window as any).updatePaginationDisplay(currentPage);
+      }
+
+      // Scroll suave al inicio de la galería
+      gallery?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Event listeners para botones
+    prevBtn?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        showPage(currentPage - 1);
+      }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        showPage(currentPage + 1);
+      }
+    });
+
+    // Delegación de eventos para botones de página (ya que se generan dinámicamente)
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    pageNumbersContainer?.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('page-btn')) {
+        const page = parseInt(target.getAttribute('data-page') || '1');
+        showPage(page);
+      }
+    });
+
+    // Inicializar PhotoSwipe
     const lightbox = new PhotoSwipeLightbox({
       gallery: '#gallery',
-      children: 'a',
+      children: 'a[data-page]',
       pswpModule: () => import('photoswipe'),
       // Opciones de PhotoSwipe
       bgOpacity: 0.95,

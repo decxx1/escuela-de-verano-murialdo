@@ -1,11 +1,18 @@
 ---
 import type { Noticia } from '@/types/strapi';
+import Pagination from '@/components/Pagination.astro';
+import { STRAPI_URL } from 'astro:env/server';
+
+const isLocalHost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
+const baseUrl = isLocalHost ? STRAPI_URL : '';
 
 interface Props {
   noticias: Noticia[];
 }
 
 const { noticias } = Astro.props;
+const newsPerPage = 12;
+const totalPages = Math.ceil(noticias.length / newsPerPage);
 
 
 // Función para formatear fecha
@@ -31,14 +38,18 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
         <p class="mt-2 text-white text-xl text-center mb-12">Mantente informado sobre las últimas novedades de nuestra escuela de verano</p>
         
         <!-- Grid de Noticias -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {noticias.map((noticia) => (
-                <article class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid">
+            {noticias.map((noticia, index) => (
+                <article 
+                    class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col news-item"
+                    data-page={Math.floor(index / newsPerPage) + 1}
+                    style={index >= newsPerPage ? 'display: none;' : ''}
+                >
                     {/* Imagen */}
                     <a href={`/blog/${noticia.documentId}`} class="block">
                         <div class="h-64 w-full relative overflow-hidden">
                             <img
-                                src={noticia.Imagen.formats.small.url}
+                                src={baseUrl + noticia.Imagen.formats.small.url}
                                 alt={noticia.Titulo}
                                 width={noticia.Imagen.formats.small.width}
                                 height={noticia.Imagen.formats.small.height}
@@ -89,6 +100,11 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
             ))}
         </div>
 
+        {/* Paginación */}
+        {totalPages > 1 && (
+            <Pagination totalPages={totalPages} />
+        )}
+
         {/* Mensaje si no hay noticias */}
         {noticias.length === 0 && (
             <div class="text-center py-20">
@@ -102,3 +118,75 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
         )}
     </section>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    let currentPage = 1;
+    const newsPerPage = 12;
+    const grid = document.getElementById('news-grid');
+    const newsItems = grid?.querySelectorAll('.news-item') || [];
+    const totalPages = Math.max(...Array.from(newsItems).map(n => parseInt(n.getAttribute('data-page') || '1')));
+    
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    const currentPageMobile = document.getElementById('current-page-mobile');
+
+    function showPage(page: number) {
+      currentPage = page;
+      
+      // Actualizar visibilidad de noticias
+      newsItems.forEach((news) => {
+        const newsPage = parseInt(news.getAttribute('data-page') || '1');
+        if (newsPage === currentPage) {
+          (news as HTMLElement).style.display = '';
+        } else {
+          (news as HTMLElement).style.display = 'none';
+        }
+      });
+
+      // Actualizar botones
+      if (prevBtn) {
+        (prevBtn as HTMLButtonElement).disabled = currentPage === 1;
+      }
+      if (nextBtn) {
+        (nextBtn as HTMLButtonElement).disabled = currentPage === totalPages;
+      }
+
+      // Actualizar indicador móvil
+      if (currentPageMobile) {
+        currentPageMobile.textContent = currentPage.toString();
+      }
+
+      // Actualizar display de paginación
+      if ((window as any).updatePaginationDisplay) {
+        (window as any).updatePaginationDisplay(currentPage);
+      }
+
+      // Scroll suave al inicio del grid
+      grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Event listeners
+    prevBtn?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        showPage(currentPage - 1);
+      }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        showPage(currentPage + 1);
+      }
+    });
+
+    // Delegación de eventos para botones de página
+    pageNumbersContainer?.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('page-btn')) {
+        const page = parseInt(target.getAttribute('data-page') || '1');
+        showPage(page);
+      }
+    });
+  });
+</script>

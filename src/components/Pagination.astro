@@ -1,0 +1,154 @@
+---
+interface Props {
+  totalPages: number;
+  maxVisiblePages?: number;
+}
+
+const { 
+  totalPages,
+  maxVisiblePages = 5 
+} = Astro.props;
+---
+
+<div 
+  class="flex justify-center items-center gap-2 sm:gap-4 mt-12" 
+  id="pagination-controls"
+  data-total-pages={totalPages}
+  data-max-visible={maxVisiblePages}
+>
+  {/* Botón Anterior */}
+  <button
+    id="prev-btn"
+    class="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-secondary text-tertiary font-bold rounded-xl hover:bg-secondary/90 transition-all duration-300 disabled:bg-gray-600 disabled:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+    disabled
+    aria-label="Página anterior"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    <span class="hidden sm:inline">Anterior</span>
+  </button>
+
+  {/* Números de página - Solo en pantallas medianas y grandes */}
+  <div class="hidden md:flex gap-2" id="page-numbers">
+    {/* Se generarán dinámicamente con JavaScript */}
+  </div>
+
+  {/* Indicador de página actual - Solo en móvil */}
+  <div class="md:hidden px-4 py-2 bg-primary/50 text-white font-bold rounded-lg" id="mobile-page-indicator">
+    <span id="current-page-mobile">1</span> / {totalPages}
+  </div>
+
+  {/* Botón Siguiente */}
+  <button
+    id="next-btn"
+    class="inline-flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-secondary text-tertiary font-bold rounded-xl hover:bg-secondary/90 transition-all duration-300 disabled:bg-gray-600 disabled:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+    aria-label="Página siguiente"
+  >
+    <span class="hidden sm:inline">Siguiente</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M5 12h14M12 5l7 7-7 7"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  // Función para calcular qué páginas mostrar
+  function getPageNumbers(current: number, total: number, maxVisible: number): (number | string)[] {
+    if (total <= maxVisible) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const pages: (number | string)[] = [];
+    const halfVisible = Math.floor(maxVisible / 2);
+    
+    pages.push(1);
+    
+    let startPage = Math.max(2, current - halfVisible);
+    let endPage = Math.min(total - 1, current + halfVisible);
+    
+    if (current <= halfVisible + 1) {
+      endPage = Math.min(total - 1, maxVisible - 1);
+    }
+    
+    if (current >= total - halfVisible) {
+      startPage = Math.max(2, total - maxVisible + 2);
+    }
+    
+    if (startPage > 2) {
+      pages.push('...');
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    if (endPage < total - 1) {
+      pages.push('...');
+    }
+    
+    if (total > 1) {
+      pages.push(total);
+    }
+    
+    return pages;
+  }
+
+  // Exportar para uso global
+  (window as any).updatePaginationDisplay = function(currentPage: number) {
+    const paginationControls = document.getElementById('pagination-controls');
+    if (!paginationControls) return;
+
+    const totalPages = parseInt(paginationControls.getAttribute('data-total-pages') || '1');
+    const maxVisible = parseInt(paginationControls.getAttribute('data-max-visible') || '5');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    
+    if (!pageNumbersContainer) return;
+
+    // Calcular páginas a mostrar
+    const pageNumbers = getPageNumbers(currentPage, totalPages, maxVisible);
+    
+    // Limpiar contenedor
+    pageNumbersContainer.innerHTML = '';
+    
+    // Generar botones
+    pageNumbers.forEach((pageNum) => {
+      if (pageNum === '...') {
+        const span = document.createElement('span');
+        span.className = 'px-4 py-2 text-white font-bold';
+        span.textContent = '...';
+        pageNumbersContainer.appendChild(span);
+      } else {
+        const button = document.createElement('button');
+        button.className = `px-4 py-2 font-bold rounded-lg transition-all duration-300 page-btn ${
+          pageNum === currentPage 
+            ? 'bg-secondary text-tertiary' 
+            : 'bg-primary/50 text-white hover:bg-secondary hover:text-tertiary'
+        }`;
+        button.setAttribute('data-page', pageNum.toString());
+        button.setAttribute('aria-label', `Ir a página ${pageNum}`);
+        if (pageNum === currentPage) {
+          button.setAttribute('aria-current', 'page');
+        }
+        button.textContent = pageNum.toString();
+        pageNumbersContainer.appendChild(button);
+      }
+    });
+  };
+
+  // Inicializar en carga
+  document.addEventListener('DOMContentLoaded', () => {
+    (window as any).updatePaginationDisplay(1);
+  });
+</script>
+
+<style>
+  /* Animación suave para cambios de página */
+  .page-btn {
+    user-select: none;
+  }
+  
+  .page-btn:active {
+    transform: scale(0.95);
+  }
+</style>

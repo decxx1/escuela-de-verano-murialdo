@@ -247,11 +247,7 @@ export const galeriasService = {
    */
   async getGalerias(page: number = 1, pageSize: number = 25): Promise<GaleriasResponse> {
     return strapiClient.get<GaleriasResponse>('/api/galerias', {
-      populate: {
-        Fotos: {
-          fields: ['id', 'documentId', 'name', 'width', 'height', 'url', 'formats']
-        }
-      },
+      populate: '*',
       sort: ['createdAt:desc'],
       pagination: {
         page,
@@ -267,11 +263,7 @@ export const galeriasService = {
    */
   async getAlbumByDocumentId(documentId: string): Promise<{ data: Album }> {
     return strapiClient.get<{ data: Album }>(`/api/galerias/${documentId}`, {
-      populate: {
-        Fotos: {
-          fields: ['id', 'documentId', 'name', 'width', 'height', 'url', 'formats']
-        }
-      }
+      populate: '*'
     });
   },
 };

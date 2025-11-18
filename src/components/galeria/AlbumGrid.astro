@@ -1,11 +1,18 @@
 ---
 import type { Album } from '@/types/strapi';
+import Pagination from '@/components/Pagination.astro';
+import { STRAPI_URL } from 'astro:env/server';
+
+const isLocalHost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
+const baseUrl = isLocalHost ? STRAPI_URL : '';
 
 interface Props {
   albumes: Album[];
 }
 
 const { albumes } = Astro.props;
+const albumsPerPage = 12;
+const totalPages = Math.ceil(albumes.length / albumsPerPage);
 
 
 // Función para formatear fecha
@@ -25,23 +32,27 @@ function formatearFecha(fecha: string): string {
         <p class="mt-2 text-white text-xl text-center mb-12">Revive los mejores momentos de nuestra escuela de verano</p>
         
         <!-- Grid de Álbumes -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {albumes.map((album) => {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="albums-grid">
+            {albumes.map((album, index) => {
                 // Obtener la primera foto como portada
                 const portada = album.Fotos[0];
                 const totalFotos = album.Fotos.length;
                 
                 return (
-                    <article class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col">
+                    <article 
+                        class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col album-item"
+                        data-page={Math.floor(index / albumsPerPage) + 1}
+                        style={index >= albumsPerPage ? 'display: none;' : ''}
+                    >
                         {/* Imagen de portada */}
                         <a href={`/galeria/${album.documentId}`} class="block relative">
                             <div class="h-72 w-full relative overflow-hidden">
                                 {portada && (
                                     <img
-                                        src={portada.formats.small.url}
+                                        src={baseUrl + portada.formats?.small?.url || 'images/logo/logo.png'}
                                         alt={album.Nombre}
-                                        width={portada.formats.small.width}
-                                        height={portada.formats.small.height}
+                                        width={portada.formats?.small?.width || 500}
+                                        height={portada.formats?.small?.height || 363}
                                         class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                                         loading="lazy"
                                     />
@@ -91,6 +102,11 @@ function formatearFecha(fecha: string): string {
             })}
         </div>
 
+        {/* Paginación */}
+        {totalPages > 1 && (
+            <Pagination totalPages={totalPages} />
+        )}
+
         {/* Mensaje si no hay álbumes */}
         {albumes.length === 0 && (
             <div class="text-center py-20">
@@ -104,3 +120,75 @@ function formatearFecha(fecha: string): string {
         )}
     </section>
 </section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    let currentPage = 1;
+    const albumsPerPage = 12;
+    const grid = document.getElementById('albums-grid');
+    const albums = grid?.querySelectorAll('.album-item') || [];
+    const totalPages = Math.max(...Array.from(albums).map(a => parseInt(a.getAttribute('data-page') || '1')));
+    
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+    const currentPageMobile = document.getElementById('current-page-mobile');
+
+    function showPage(page: number) {
+      currentPage = page;
+      
+      // Actualizar visibilidad de álbumes
+      albums.forEach((album) => {
+        const albumPage = parseInt(album.getAttribute('data-page') || '1');
+        if (albumPage === currentPage) {
+          (album as HTMLElement).style.display = '';
+        } else {
+          (album as HTMLElement).style.display = 'none';
+        }
+      });
+
+      // Actualizar botones
+      if (prevBtn) {
+        (prevBtn as HTMLButtonElement).disabled = currentPage === 1;
+      }
+      if (nextBtn) {
+        (nextBtn as HTMLButtonElement).disabled = currentPage === totalPages;
+      }
+
+      // Actualizar indicador móvil
+      if (currentPageMobile) {
+        currentPageMobile.textContent = currentPage.toString();
+      }
+
+      // Actualizar display de paginación
+      if ((window as any).updatePaginationDisplay) {
+        (window as any).updatePaginationDisplay(currentPage);
+      }
+
+      // Scroll suave al inicio del grid
+      grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Event listeners
+    prevBtn?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        showPage(currentPage - 1);
+      }
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        showPage(currentPage + 1);
+      }
+    });
+
+    // Delegación de eventos para botones de página
+    pageNumbersContainer?.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('page-btn')) {
+        const page = parseInt(target.getAttribute('data-page') || '1');
+        showPage(page);
+      }
+    });
+  });
+</script>
