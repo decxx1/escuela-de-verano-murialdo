@@ -15,7 +15,7 @@ function formatearFecha(fecha: string): string {
   });
 }
 
-const isLocalHost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
+const isLocalHost = Astro.url.hostname === 'localhost';
 const baseUrl = isLocalHost ? STRAPI_URL : '';
 
 // getStaticPaths para generar todas las páginas en build time

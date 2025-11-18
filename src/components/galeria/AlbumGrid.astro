@@ -3,7 +3,7 @@ import type { Album } from '@/types/strapi';
 import Pagination from '@/components/Pagination.astro';
 import { STRAPI_URL } from 'astro:env/server';
 
-const isLocalHost = Astro.url.hostname === 'localhost' || Astro.url.hostname === '127.0.0.1';
+const isLocalHost = Astro.url.hostname === 'localhost';
 const baseUrl = isLocalHost ? STRAPI_URL : '';
 
 interface Props {
