@@ -4,6 +4,7 @@ import Pagination from '@/components/Pagination.astro';
 import { galeriasService } from '@/services/strapi';
 import type { Album } from '@/types/strapi';
 import { STRAPI_URL } from 'astro:env/server';
+import { IS_PROD } from 'astro:env/client';
 
 // Función para formatear fecha
 function formatearFecha(fecha: string): string {
@@ -15,8 +16,7 @@ function formatearFecha(fecha: string): string {
   });
 }
 
-const isLocalHost = Astro.url.hostname === 'localhost';
-const baseUrl = isLocalHost ? STRAPI_URL : '';
+const baseUrl = !IS_PROD ? STRAPI_URL : '';
 
 // getStaticPaths para generar todas las páginas en build time
 export async function getStaticPaths() {

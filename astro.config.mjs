@@ -18,6 +18,7 @@ export default defineConfig({
       SITE_KEY: envField.string({ context: "client", access: "public", optional: true }),
       ENDPOINT: envField.string({ context: "client", access: "public", optional: true }),
       STRAPI_URL: envField.string({ context: "server", access: "secret", optional: true }),
+      IS_PROD: envField.boolean({ context: "client", access: "public", optional: true }),
     }
   }
 });

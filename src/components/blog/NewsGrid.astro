@@ -2,9 +2,9 @@
 import type { Noticia } from '@/types/strapi';
 import Pagination from '@/components/Pagination.astro';
 import { STRAPI_URL } from 'astro:env/server';
+import { IS_PROD } from 'astro:env/client';
 
-const isLocalHost = Astro.url.hostname === 'localhost';
-const baseUrl = isLocalHost ? STRAPI_URL : '';
+const baseUrl = !IS_PROD ? STRAPI_URL : '';
 
 interface Props {
   noticias: Noticia[];

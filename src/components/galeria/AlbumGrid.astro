@@ -2,9 +2,9 @@
 import type { Album } from '@/types/strapi';
 import Pagination from '@/components/Pagination.astro';
 import { STRAPI_URL } from 'astro:env/server';
+import { IS_PROD } from 'astro:env/client';
 
-const isLocalHost = Astro.url.hostname === 'localhost';
-const baseUrl = isLocalHost ? STRAPI_URL : '';
+const baseUrl = !IS_PROD ? STRAPI_URL : '';
 
 interface Props {
   albumes: Album[];
@@ -81,7 +81,7 @@ function formatearFecha(fecha: string): string {
 
                             {/* Nombre del álbum */}
                             <a href={`/galeria/${album.documentId}`} class="block mb-4">
-                                <h3 class="text-tertiary text-outline-secondary-2 font-atma font-semibold text-2xl md:text-3xl hover:text-secondary transition-colors duration-200">
+                                <h3 class="text-tertiary text-outline-secondary-2 font-atma font-semibold text-2xl md:text-3xl hover:text-primary transition-colors duration-200">
                                     {album.Nombre}
                                 </h3>
                             </a>
