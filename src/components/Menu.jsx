@@ -13,6 +13,10 @@ export default function Menu1({ currentPath = '/' }) {
     const getActiveClass = (path) => {
         return isActive(path) ? 'bg-secondary text-tertiary font-semibold' : '';
     };
+    // Clases para enlaces activos en grupo
+    const getActiveGroupClass = (path) => {
+        return isActive(path) ? 'bg-secondary text-tertiary font-semibold' : '';
+    };
 
     return (
         <>
@@ -22,18 +26,18 @@ export default function Menu1({ currentPath = '/' }) {
                 offsetDistance={10}
                 className="bg-primary divide-y divide-light rounded-xl shadow w-52 lg:w-72 xl:w-96"
                 trigger={
-                    <div className={`inline-flex items-center group max-sm:w-full rounded-xl ${getActiveClass('/')}`}>
+                    <div className={`inline-flex items-center max-sm:w-full rounded-xl`}>
                         <a 
                             href="/" 
-                            className={`cursor-pointer max-sm:hover:text-primary sm:hover:bg-primary/70 sm:hover:text-white pl-2 pr-1 py-2 rounded-l-xl max-sm:group-hover:text-primary max-sm:group-hover:bg-light`}
+                            className={`cursor-pointer max-sm:hover:text-primary sm:hover:bg-primary/70 sm:hover:text-white pl-2 pr-1 py-2 rounded-l-xl ${getActiveGroupClass('/')}`}
                         >
                             Inicio
                         </a>
                         <button
-                            className="inline-flex items-center cursor-pointer sm:hover:bg-primary/70 sm:hover:text-white pl-1 pr-2 py-4 rounded-r-xl max-sm:group-hover:text-primary max-sm:group-hover:bg-light"
+                            className={`inline-flex items-center cursor-pointer sm:hover:bg-primary/70 sm:hover:text-white pl-1 pr-2 py-4 rounded-r-xl ${getActiveGroupClass('/')}`}
                             type="button"
                         >
-                            <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <svg className="size-3 2xl:size-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
                             </svg>
                         </button>

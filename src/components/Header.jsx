@@ -78,7 +78,7 @@ export default function Header({ currentPath }) {
                     
                     {/* Menú completo a la derecha */}
                     <nav className={`${scrolled ? "pl-20" : ""} max-lg:hidden bg-header py-4 lg:py-2 xl:py-4 rounded-3xl transition-[padding-left] duration-300`}>
-                        <ul className="flex items-center justify-center gap-2 lg:gap-4 2xl:gap-8 text-white text-xl lg:text-xl 2xl:text-3xl px-6">
+                        <ul className="flex items-center justify-center gap-2 lg:gap-4 2xl:gap-8 text-white text-xl lg:text-lg 2xl:text-3xl px-6">
                             <Menu currentPath={currentPath} />
                         </ul>
                     </nav>
