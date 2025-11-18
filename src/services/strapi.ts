@@ -48,6 +48,9 @@ class StrapiClient {
 /**
  * Instancia del cliente de Strapi
  */
+if (!STRAPI_URL) {
+  throw new Error('STRAPI_URL no está definida en las variables de entorno');
+}
 const strapiClient = new StrapiClient(STRAPI_URL);
 
 /**
