@@ -23,7 +23,7 @@ try {
         <article class="border-2 border-secondary rounded-3xl px-4 py-4 col-span-12 md:col-span-4 lg:col-span-4 max-sm:max-h-80">
             <div class="text-center text-primary p-8">
                 
-                <img loading="lazy" src="/images/logo/logo.png" alt="Logo Club Leonardo Murialdo" class="w-32 md:w-full h-auto" />
+                <img loading="lazy" src="/images/logo/logo.png" alt="Logo Club Leonardo Murialdo" class="w-full h-auto" />
                 
             </div>
         </article>
@@ -42,24 +42,32 @@ try {
                 {contacto && (
                     <ul>
                         <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
-                            <a href={`tel:${contacto.Telefono}`} target="_blank">
-                                <Phone class="mr-2 w-7 h-auto inline" />{formatPhone(contacto.Telefono)}
+                            <a href={`tel:${contacto.Telefono}`} target="_blank" class="inline-flex items-center">
+                                <Phone class="mr-2 w-7 h-auto inline shrink-0" />
+                                <span class="inline!">
+                                    {formatPhone(contacto.Telefono)}
+                                </span>
                             </a>
                         </li>
                         <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
-                            <a href={`https://wa.me/${contacto.Whatsapp}`} target="_blank">
-                                <Whatsapp class="mr-2 w-7 h-auto inline" />{formatPhone(contacto.Whatsapp)}
+                            <a href={`https://wa.me/${contacto.Whatsapp}`} target="_blank" class="inline-flex items-center">
+                                <Whatsapp class="mr-2 w-7 h-auto inline shrink-0" />
+                                <span class="inline!">
+                                    {formatPhone(contacto.Whatsapp)}
+                                </span>
                             </a>
                         </li>
-                        <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
-                            <a href={`mailto:${contacto.Email}`}>
-                                <Email class="mr-2 w-7 h-auto inline" />{contacto.Email}
+                        <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary ">
+                            <a href={`mailto:${contacto.Email}`} class="inline-flex items-center">
+                                <Email class="mr-2 w-7 h-auto shrink-0" /><span class="inline! break-all">{contacto.Email}</span>
                             </a>
                         </li>
                         <li class="text-white text-md md:text-sm lg:text-lg hover:text-secondary">
-                            <a href={contacto.MapUrl} target="_blank">
-                                <Mapmarker class="mr-2 w-7 h-auto inline" />
-                                {contacto.Ubicacion}
+                            <a href={contacto.MapUrl} target="_blank" class="inline-flex items-center">
+                                <Mapmarker class="mr-2 w-7 h-auto inline shrink-0" />
+                                <span class="inline!">
+                                    {contacto.Ubicacion}
+                                </span>
                             </a>
                         </li>
                     </ul>

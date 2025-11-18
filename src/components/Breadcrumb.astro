@@ -7,7 +7,7 @@ interface Props {
 
 const { title, img, filter } = Astro.props;
 ---
-<section class="container mx-auto mt-[150px] md:mt-[140px] lg:mt-[160px]">
+<section class="container mx-auto mt-[130px] sm:mt-[150px] md:mt-[140px] lg:mt-[160px]">
     <div 
         class={`${filter ? "bg-black/40 bg-blend-multiply" : ""} bg-no-repeat bg-cover bg-center h-full w-full rounded-3xl`}
         style={{ backgroundImage: `url(${img})` }}
@@ -15,7 +15,7 @@ const { title, img, filter } = Astro.props;
         
         <div class="relative w-full">
             <div class="flex justify-center relative h-[calc(70vh-14rem)] mx-5 sm:mx-10">
-                <h1 class="absolute top-5 left-1/2 -translate-x-1/2 z-10 text-primary text-outline-3 sm:text-outline-4 sm:pt-6 text-center font-extrabold  text-3xl md:text-5xl">
+                <h1 class="absolute top-10 sm:top-5 left-1/2 -translate-x-1/2 z-10 text-primary text-outline-3 sm:text-outline-4 sm:pt-6 text-center font-extrabold text-3xl md:text-5xl">
                     {title}
                 </h1>
             </div>
