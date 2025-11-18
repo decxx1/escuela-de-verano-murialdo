@@ -3,7 +3,6 @@ import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import { galeriasService } from '@/services/strapi';
 import type { Album } from '@/types/strapi';
-import { STRAPI_URL } from 'astro:env/server';
 
 
 // Función para formatear fecha
@@ -37,7 +36,7 @@ const { album } = Astro.props as { album: Album };
 
 const preloadImages = album.Fotos.length > 0 ? [
   {
-    href: STRAPI_URL + album.Fotos[0].formats.small.url,
+    href: album.Fotos[0].formats.small.url,
     as: "image",
     type: "image/jpeg",
   }
@@ -48,7 +47,7 @@ const preloadImages = album.Fotos.length > 0 ? [
   title={`${album.Nombre} - Galería - Escuela de verano Club Leonardo Murialdo`}
   canonical={`https://escueladeveranomurialdo.com.ar/galeria/${album.documentId}`}
   metaDescription={`Fotos del álbum ${album.Nombre} de la Escuela de Verano del Club Leonardo Murialdo. ${album.Fotos.length} fotos disponibles.`}
-  metaImg={album.Fotos.length > 0 ? STRAPI_URL + album.Fotos[0].url : "https://escueladeveranomurialdo.com.ar/images/index/escuela-de-verano.webp"}
+  metaImg={album.Fotos.length > 0 ? album.Fotos[0].url : "https://escueladeveranomurialdo.com.ar/images/index/escuela-de-verano.webp"}
   preLoad={preloadImages}
 >
   <Breadcrumb title="Galería" img="/images/index/escuela-de-verano.webp" />
@@ -78,10 +77,10 @@ const preloadImages = album.Fotos.length > 0 ? [
             style={`aspect-ratio: ${foto.width}/${foto.height};`}
             data-pswp-width={foto.width}
             data-pswp-height={foto.height}
-            data-pswp-src={STRAPI_URL + foto.url}
+            data-pswp-src={foto.url}
           >
             <img
-              src={STRAPI_URL + foto.formats.small.url}
+              src={foto.formats.small.url}
               alt={foto.name}
               width={foto.formats.small.width}
               height={foto.formats.small.height}
