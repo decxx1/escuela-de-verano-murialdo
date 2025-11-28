@@ -55,6 +55,7 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
                                 height={noticia.Imagen.formats.small.height}
                                 class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                                 loading="lazy"
+                                transition:name={noticia.documentId}
                             />
                         </div>
                     </a>

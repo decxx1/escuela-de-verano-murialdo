@@ -9,6 +9,7 @@ import '@fontsource/atma/700.css';
 import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.jsx';
 import FloatingButton from '@/components/FloatingButton.astro';
+import { ClientRouter } from 'astro:transitions';
 
 import type { Preload } from "@/types/Preload"
 
@@ -70,6 +71,7 @@ const currentPath = Astro.url.pathname;
 				<link rel="preload" {as} {href} {type} />
 			))
 		}
+		<ClientRouter />
 	</head>
 	<body class="font-inter scrollbar scrollbar-w-3 scrollbar-thumb-rounded-[0.25rem] scrollbar-track-gray-200 scrollbar-thumb-gray-400">
 		<div class="fixed left-0 top-0 -z-10 h-full w-full">
