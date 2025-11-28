@@ -16,54 +16,349 @@
     --breakpoint-xs: 30rem;
 }
 
-@utility text-outline {
-  -webkit-text-stroke: 4px white;
-  paint-order: stroke fill;
-}
-@utility text-outline-2 {
-  -webkit-text-stroke: 8px white;
-  paint-order: stroke fill;
-}
-@utility text-outline-3 {
-  -webkit-text-stroke: 12px white;
-  paint-order: stroke fill;
-}
-@utility text-outline-4 {
-  -webkit-text-stroke: 16px white;
-  paint-order: stroke fill;
-}
-@utility text-outline-secondary {
-  -webkit-text-stroke: 4px var(--color-secondary);
-  paint-order: stroke fill;
-}
-@utility text-outline-secondary-2 {
-  -webkit-text-stroke: 8px var(--color-secondary);
-  paint-order: stroke fill;
-}
-@utility text-outline-secondary-3 {
-  -webkit-text-stroke: 12px var(--color-secondary);
-  paint-order: stroke fill;
-}
-@utility text-outline-secondary-4 {
-  -webkit-text-stroke: 16px var(--color-secondary);
-  paint-order: stroke fill;
-}
-@utility text-outline-tertiary {
-  -webkit-text-stroke: 4px var(--color-tertiary);
-  paint-order: stroke fill;
-}
-@utility text-outline-tertiary-2 {
-  -webkit-text-stroke: 8px var(--color-tertiary);
-  paint-order: stroke fill;
-}
-@utility text-outline-tertiary-3 {
-  -webkit-text-stroke: 12px var(--color-tertiary);
-  paint-order: stroke fill;
-}
-@utility text-outline-tertiary-4 {
-  -webkit-text-stroke: 16px var(--color-tertiary);
-  paint-order: stroke fill;
-}
+@layer utilities {
+  .text-outline-4 {
+    text-shadow: 0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white,
+    0 0 12px white;
+  }
+  .text-outline-3 {
+    text-shadow: 0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white,
+    0 0 8px white;
+  }
+  .text-outline-2 {
+    text-shadow: 0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white,
+    0 0 6px white;
+  }
+  .text-outline {
+    text-shadow: 0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white,
+    0 0 4px white;
+  }
+
+  .text-outline-secondary-4 {
+    text-shadow: 0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary),
+    0 0 12px var(--color-secondary);
+  }
+  .text-outline-secondary-3 {
+    text-shadow: 0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary),
+    0 0 8px var(--color-secondary);
+  }
+  .text-outline-secondary-2 {
+    text-shadow: 0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary),
+    0 0 6px var(--color-secondary);
+  }
+  .text-outline-secondary {
+    text-shadow: 0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary),
+    0 0 4px var(--color-secondary);
+  }
+
+  .text-outline-tertiary-4 {
+    text-shadow: 0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary),
+    0 0 12px var(--color-tertiary);
+  }
+  .text-outline-tertiary-3 {
+    text-shadow: 0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary),
+    0 0 8px var(--color-tertiary);
+  }
+  .text-outline-tertiary-2 {
+    text-shadow: 0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary),
+    0 0 6px var(--color-tertiary);
+  }
+  .text-outline-tertiary {
+    text-shadow: 0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary),
+    0 0 4px var(--color-tertiary);
+  }
+  @supports (paint-order: stroke fill) {
+    .text-outline-4 {
+      -webkit-text-stroke: 16px white;
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-3 {
+      -webkit-text-stroke: 12px white;
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-2 {
+      -webkit-text-stroke: 8px white;
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline {
+      -webkit-text-stroke: 4px white;
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-secondary {
+      -webkit-text-stroke: 4px var(--color-secondary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-secondary-2 {
+      -webkit-text-stroke: 8px var(--color-secondary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-secondary-3 {
+      -webkit-text-stroke: 12px var(--color-secondary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-secondary-4 {
+      -webkit-text-stroke: 16px var(--color-secondary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-tertiary {
+      -webkit-text-stroke: 4px var(--color-tertiary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-tertiary-2 {
+      -webkit-text-stroke: 8px var(--color-tertiary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-tertiary-3 {
+      -webkit-text-stroke: 12px var(--color-tertiary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+    .text-outline-tertiary-4 {
+      -webkit-text-stroke: 16px var(--color-tertiary);
+      paint-order: stroke fill;
+      text-shadow: none;
+    }
+  }
+} 
+
 
 
 @plugin "@tailwindcss/typography";
