@@ -2,7 +2,7 @@
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import ContactInfo from '@/components/contacto/ContactInfo.astro';
-import ContactForm from '@/components/contacto/ContactForm.astro';
+import ContactForm from '@/components/contacto/ContactForm.jsx';
 import ContactMap from '@/components/contacto/ContactMap.astro';
 import { contactoService } from '@/services/strapi';
 import type { Contacto } from '@/types/strapi';
@@ -47,13 +47,16 @@ try {
 				<ContactInfo contacto={contacto} />
 				
 				<!-- Columna Derecha: Formulario de Contacto -->
-				<ContactForm addressee={contacto?.Email || ''} />
+				<ContactForm
+					client:load
+					addressee={contacto?.Email || ''}
+				/>
 			</div>
             <!-- Mapa sin columna -->
-            <ContactMap mapIframe={contacto?.MapIframe || ''} />
+            <ContactMap mapIframe={(contacto?.MapIframe || '')} />
 		</section>
 	</section>
 </Layout>
 
 <!-- recaptcha v3 -->
-<script async src={'https://www.google.com/recaptcha/api.js?render=' + SITE_KEY}></script>
+<script async src={'https://www.google.com/recaptcha/api.js?render=' + SITE_KEY} data-astro-rerun></script>
