@@ -121,7 +121,7 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
 </section>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     let currentPage = 1;
     const newsPerPage = 12;
     const grid = document.getElementById('news-grid');

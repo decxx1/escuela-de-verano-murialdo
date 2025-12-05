@@ -122,7 +122,7 @@ function formatearFecha(fecha: string): string {
 </section>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     let currentPage = 1;
     const albumsPerPage = 12;
     const grid = document.getElementById('albums-grid');

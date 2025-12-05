@@ -163,7 +163,7 @@ const preloadImages = todasLasFotos.length > 0 ? [
   import 'photoswipe/style.css';
 
   // Inicializar cuando el DOM esté listo
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('astro:page-load', () => {
     // Variables de paginación
     let currentPage = 1;
     const pageSize = 10;
