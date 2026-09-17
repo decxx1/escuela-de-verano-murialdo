@@ -1,6 +1,6 @@
 ---
-import { contactoService } from '@/services/strapi';
-import type { Contacto } from '@/types/strapi';
+import { contactoService } from '@/services/cms';
+import type { Contacto } from '@/types/content';
 import Facebook from '@/assets/icons/contact/facebook.svg';
 import Instagram from '@/assets/icons/contact/instagram.svg';
 import Whatsapp from '@/assets/icons/contact/whatsapp.svg';
@@ -42,7 +42,7 @@ try {
                 {contacto && (
                     <ul>
                         <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
-                            <a href={`tel:${contacto.Telefono}`} target="_blank" class="inline-flex items-center">
+                            <a href={`tel:${contacto.Telefono.replace(/\D/g, '')}`} target="_blank" class="inline-flex items-center">
                                 <Phone class="mr-2 w-7 h-auto inline shrink-0" />
                                 <span class="inline!">
                                     {formatPhone(contacto.Telefono)}
@@ -50,7 +50,7 @@ try {
                             </a>
                         </li>
                         <li class="text-white text-lg md:text-md lg:text-xl mb-2 hover:text-secondary">
-                            <a href={`https://wa.me/${contacto.Whatsapp}`} target="_blank" class="inline-flex items-center">
+                            <a href={`https://wa.me/${contacto.Whatsapp.replace(/\D/g, '')}`} target="_blank" class="inline-flex items-center">
                                 <Whatsapp class="mr-2 w-7 h-auto inline shrink-0" />
                                 <span class="inline!">
                                     {formatPhone(contacto.Whatsapp)}

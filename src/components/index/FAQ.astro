@@ -1,13 +1,6 @@
 ---
-import { preguntasFrecuentesService } from '@/services/strapi';
-import type { PreguntaFrecuente } from '@/types/strapi';
-import { marked } from 'marked';
-
-// Configurar marked para generar HTML seguro
-marked.setOptions({
-  breaks: true,
-  gfm: true,
-});
+import { preguntasFrecuentesService } from '@/services/cms';
+import type { PreguntaFrecuente } from '@/types/content';
 
 // Obtener las preguntas frecuentes desde Strapi durante el build
 let preguntas: PreguntaFrecuente[] = [];
@@ -54,7 +47,7 @@ try {
                         <div class={`faq-content px-4 transition-all duration-300 ${isOpen ? 'pb-2 max-h-full' : 'pb-0 max-h-0 overflow-hidden'}`}>
                             <div 
                                 class="text-white text-base leading-relaxed pl-16 prose prose-invert prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1"
-                                set:html={marked.parse(pregunta.Respuesta)}
+                                set:html={pregunta.RespuestaHTML}
                             />
                         </div>
                     </div>

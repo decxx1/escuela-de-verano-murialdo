@@ -1,15 +1,8 @@
 ---
-import { actividadesService } from '@/services/strapi';
-import type { Actividad } from '@/types/strapi';
-import { marked } from 'marked';
+import { actividadesService } from '@/services/cms';
+import type { Actividad } from '@/types/content';
 
-// Configurar marked para generar HTML seguro
-marked.setOptions({
-  breaks: true,
-  gfm: true,
-});
-
-// Obtener las actividades desde Strapi durante el build
+// Obtener las actividades publicadas desde el CMS durante el build
 let actividades: Actividad[] = [];
 try {
   const response = await actividadesService.getActividades();
@@ -89,8 +82,9 @@ function getBentoClass(actividad: Actividad, index: number): { gridClass: string
                                             height={actividad.Icono.height}
                                             viewBox={`0 0 ${actividad.Icono.width} ${actividad.Icono.height}`}
                                             class="w-8 h-8 text-secondary"
-                                            set:html={actividad.Icono.iconData}
-                                        />
+                                        >
+                                            {actividad.Icono.paths.map((path) => <path d={path.d} fill="currentColor" fill-rule={path.fillRule} clip-rule={path.clipRule} />)}
+                                        </svg>
                                     </div>
                                 )}
                                 <div class="flex-1">
@@ -108,7 +102,7 @@ function getBentoClass(actividad: Actividad, index: number): { gridClass: string
                             {/* Descripción con Markdown */}
                             <div 
                                 class={`text-white prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:text-white prose-headings:text-white prose-blockquote:text-gray-300 prose-a:text-white flex-1 overflow-y-auto ${isLarge ? 'prose-base' : 'prose-sm'}`}
-                                set:html={marked.parse(actividad.Descripcion)}
+                                set:html={actividad.DescripcionHTML}
                             />
                         </div>
                     </article>

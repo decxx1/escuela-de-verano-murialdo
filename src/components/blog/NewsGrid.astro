@@ -1,10 +1,6 @@
 ---
-import type { Noticia } from '@/types/strapi';
+import type { Noticia } from '@/types/content';
 import Pagination from '@/components/Pagination.astro';
-import { STRAPI_URL } from 'astro:env/server';
-import { IS_PROD } from 'astro:env/client';
-
-const baseUrl = !IS_PROD ? STRAPI_URL : '';
 
 interface Props {
   noticias: Noticia[];
@@ -49,7 +45,7 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
                     <a href={`/blog/${noticia.documentId}`} class="block">
                         <div class="h-64 w-full relative overflow-hidden">
                             <img
-                                src={baseUrl + noticia.Imagen.formats.small.url}
+                                src={noticia.Imagen.formats.small.url}
                                 alt={noticia.Titulo}
                                 width={noticia.Imagen.formats.small.width}
                                 height={noticia.Imagen.formats.small.height}
@@ -83,7 +79,7 @@ function truncarTexto(texto: string, maxLength: number = 150): string {
 
                         {/* Preview del texto */}
                         <p class="text-white/80 text-sm mb-4 flex-1">
-                            {truncarTexto(noticia.Texto.replace(/[#*\-\[\]]/g, ''))}
+                            {noticia.Resumen || truncarTexto(noticia.Texto.replace(/[#*\-\[\]]/g, ''))}
                         </p>
 
                         {/* Botón Leer más */}

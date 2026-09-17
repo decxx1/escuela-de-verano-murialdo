@@ -1,10 +1,6 @@
 ---
-import type { Album } from '@/types/strapi';
+import type { Album } from '@/types/content';
 import Pagination from '@/components/Pagination.astro';
-import { STRAPI_URL } from 'astro:env/server';
-import { IS_PROD } from 'astro:env/client';
-
-const baseUrl = !IS_PROD ? STRAPI_URL : '';
 
 interface Props {
   albumes: Album[];
@@ -49,7 +45,7 @@ function formatearFecha(fecha: string): string {
                             <div class="h-72 w-full relative overflow-hidden">
                                 {portada && (
                                     <img
-                                        src={baseUrl + portada.formats?.small?.url || 'images/logo/logo.png'}
+                                        src={portada.formats?.small?.url || portada.url || '/images/logo/logo.png'}
                                         alt={album.Nombre}
                                         width={portada.formats?.small?.width || 500}
                                         height={portada.formats?.small?.height || 363}

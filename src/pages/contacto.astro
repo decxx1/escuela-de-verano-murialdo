@@ -4,8 +4,8 @@ import Breadcrumb from '@/components/Breadcrumb.astro';
 import ContactInfo from '@/components/contacto/ContactInfo.astro';
 import ContactForm from '@/components/contacto/ContactForm.jsx';
 import ContactMap from '@/components/contacto/ContactMap.astro';
-import { contactoService } from '@/services/strapi';
-import type { Contacto } from '@/types/strapi';
+import { contactoService } from '@/services/cms';
+import type { Contacto } from '@/types/content';
 import { SITE_KEY } from "astro:env/client";
 
 const preloadImages = [
@@ -53,7 +53,7 @@ try {
 				/>
 			</div>
             <!-- Mapa sin columna -->
-            <ContactMap mapIframe={(contacto?.MapIframe || '')} />
+            <ContactMap mapEmbedUrl={(contacto?.MapEmbedUrl || '')} />
 		</section>
 	</section>
 </Layout>

@@ -1,6 +1,5 @@
 ---
-import type { MiembroEquipo } from '@/types/strapi';
-import { STRAPI_URL } from 'astro:env/server';
+import type { MiembroEquipo } from '@/types/content';
 
 interface Props {
   equipo: MiembroEquipo[];
@@ -26,7 +25,7 @@ const equipoOrdenado = [...equipo].sort((a, b) => parseInt(a.Orden) - parseInt(b
                     {/* Imagen */}
                     <div class="h-96 w-full relative aspect-auto overflow-hidden">
                         <img
-                            src={STRAPI_URL + miembro.Imagen.formats.small.url}
+                            src={miembro.Imagen.formats.small.url}
                             alt={miembro.Nombre}
                             width={miembro.Imagen.formats.small.width}
                             height={miembro.Imagen.formats.small.height}

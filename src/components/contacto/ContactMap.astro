@@ -1,14 +1,15 @@
 ---
 // Recibir email de contacto por props
 interface Props {
-  mapIframe: string;
+  mapEmbedUrl: string;
 }
 
-const { mapIframe } = Astro.props;
+const { mapEmbedUrl } = Astro.props;
+const validUrl = /^https:\/\/www\.google\.com\/maps\/embed\?/.test(mapEmbedUrl);
 ---
 
-{mapIframe && (
+{validUrl && (
     <article class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300">
-        <div class="aspect-auto" set:html={mapIframe} />
+        <div class="aspect-auto"><iframe src={mapEmbedUrl} title="Ubicación del Club Leonardo Murialdo" width="100%" height="450" style="border:0" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" /></div>
     </article>
 )}

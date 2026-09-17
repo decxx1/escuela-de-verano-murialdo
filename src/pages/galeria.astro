@@ -2,8 +2,8 @@
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import AlbumGrid from '@/components/galeria/AlbumGrid.astro';
-import { galeriasService } from '@/services/strapi';
-import type { Album } from '@/types/strapi';
+import { galeriasService } from '@/services/cms';
+import type { Album } from '@/types/content';
 
 const preloadImages = [
 	{
@@ -19,8 +19,7 @@ const preloadImages = [
 let albumes: Album[] = [];
 
 try {
-	const response = await galeriasService.getGalerias(1, 100);
-	albumes = response.data;
+	albumes = await galeriasService.getAllGalerias();
 } catch (error) {
 	console.error('Error al obtener álbumes:', error);
 }

@@ -2,8 +2,8 @@
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import NewsGrid from '@/components/blog/NewsGrid.astro';
-import { noticiasService } from '@/services/strapi';
-import type { Noticia } from '@/types/strapi';
+import { noticiasService } from '@/services/cms';
+import type { Noticia } from '@/types/content';
 
 const preloadImages = [
 	{
@@ -17,8 +17,7 @@ const preloadImages = [
 let noticias: Noticia[] = [];
 
 try {
-	const response = await noticiasService.getNoticias(1, 25);
-	noticias = response.data;
+	noticias = await noticiasService.getAllNoticias();
 } catch (error) {
 	console.error('Error al obtener noticias:', error);
 }

@@ -1,6 +1,6 @@
 ---
-import { contactoService, ajusteService } from '@/services/strapi';
-import type { ArchivoFormulario } from '@/types/strapi';
+import { contactoService, ajusteService } from '@/services/cms';
+import type { ArchivoFormulario } from '@/types/content';
 
 // Obtener datos de contacto y ajustes desde Strapi
 let whatsappNumber = '';
@@ -55,7 +55,7 @@ try {
                 <span class="floating-text">Formulario</span>
             </a>
         )}
-        <a href={`https://wa.me/${whatsappNumber}`} target="_blank" class="floating-option whatsapp-option">
+        <a href={`https://wa.me/${whatsappNumber.replace(/\D/g, '')}`} target="_blank" class="floating-option whatsapp-option">
             <svg class="floating-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 258">
                 <defs>
                     <linearGradient id="logosWhatsappIcon0" x1="50%" x2="50%" y1="100%" y2="0%">
@@ -79,7 +79,7 @@ try {
             </svg>
             <span class="floating-text">Ubicación</span>
         </a>
-        <a href={`tel:${phoneNumber}`} class="floating-option phone-option">
+        <a href={`tel:${phoneNumber.replace(/\D/g, '')}`} class="floating-option phone-option">
             <svg class="floating-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill="currentColor" fill-rule="evenodd" d="M4.063 1.25h3.751a.75.75 0 0 1 .702.486l1.456 3.87a.75.75 0 0 1 .035.401l-.73 3.912c.897 2.108 2.378 3.525 4.833 4.796l3.865-.75a.75.75 0 0 1 .41.036l3.882 1.48a.75.75 0 0 1 .483.7v3.584c0 1.626-1.432 2.945-3.108 2.58c-3.053-.664-8.71-2.353-12.672-6.315c-3.796-3.795-5.068-9.037-5.495-11.87c-.245-1.618 1.052-2.91 2.588-2.91" clip-rule="evenodd" />
             </svg>

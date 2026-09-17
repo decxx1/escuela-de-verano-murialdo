@@ -1,5 +1,5 @@
 ---
-import type { Contacto } from '@/types/strapi';
+import type { Contacto } from '@/types/content';
 import Phone from '@/assets/icons/contact/phone.svg';
 import Whatsapp from '@/assets/icons/contact/whatsapp.svg';
 import Mapmarker from '@/assets/icons/contact/mapmarker.svg';
@@ -27,7 +27,7 @@ const { contacto } = Astro.props;
                     <div>
                         <h4 class="text-white font-bold text-lg mb-2">Para consultas:</h4>
                         <a 
-                            href={`https://wa.me/${contacto.Whatsapp}`}
+                            href={`https://wa.me/${contacto.Whatsapp.replace(/\D/g, '')}`}
                             target="_blank"
                             class="text-white hover:text-secondary transition-colors duration-200 text-base md:text-lg flex items-center gap-2"
                         >
@@ -39,7 +39,7 @@ const { contacto } = Astro.props;
                     <div>
                         <h4 class="text-white font-bold text-lg mb-2">Para inscripciones:</h4>
                         <a 
-                            href={`tel:${contacto.Telefono}`}
+                            href={`tel:${contacto.Telefono.replace(/\D/g, '')}`}
                             class="text-white hover:text-secondary transition-colors duration-200 text-base md:text-lg flex items-center gap-2"
                         >
                             <Phone class="w-5 h-5" />

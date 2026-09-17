@@ -1,12 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import { noticiasService } from '@/services/strapi';
-import type { Noticia } from '@/types/strapi';
-import { marked } from 'marked';
-import { STRAPI_URL } from 'astro:env/server';
-import { IS_PROD } from 'astro:env/client';
-
-const baseUrl = !IS_PROD ? STRAPI_URL : '';
+import { noticiasService } from '@/services/cms';
+import type { Noticia } from '@/types/content';
 
 // Función para formatear fecha
 function formatearFecha(fecha: string): string {
@@ -20,18 +15,11 @@ function formatearFecha(fecha: string): string {
 
 // getStaticPaths para generar todas las páginas en build time
 export async function getStaticPaths() {
-  try {
-    // Obtener todas las noticias (sin paginación para build)
-    const response = await noticiasService.getNoticias(1, 100);
-    
-    return response.data.map((noticia) => ({
+    const noticias = await noticiasService.getAllNoticias();
+    return noticias.map((noticia) => ({
       params: { slug: noticia.documentId },
       props: { noticia },
     }));
-  } catch (error) {
-    console.error('Error al obtener noticias para getStaticPaths:', error);
-    return [];
-  }
 }
 
 // Obtener la noticia de las props
@@ -75,7 +63,7 @@ const preloadImages = [
       {/* Imagen principal */}
       <div class="mb-8 rounded-3xl overflow-hidden border-2 border-secondary">
         <img
-          src={baseUrl + noticia.Imagen.url}
+          src={noticia.Imagen.url}
           alt={noticia.Titulo}
           class="w-full h-auto"
           loading="eager"
@@ -95,7 +83,7 @@ const preloadImages = [
                prose-blockquote:text-white prose-blockquote:border-l-secondary
                prose-code:text-secondary prose-code:bg-primary/20 prose-code:px-2 prose-code:py-1 prose-code:rounded
                prose-pre:bg-primary/20 prose-pre:border-2 prose-pre:border-secondary"
-        set:html={marked.parse(noticia.Texto)}
+        set:html={noticia.TextoHTML}
       />
 
       {/* Botón volver */}
