@@ -2,13 +2,17 @@
 import { defineConfig, envField } from 'astro/config';
 
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 
 import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://escueladeveranomurialdo.com.ar',
-  integrations: [react()],
+  trailingSlash: 'never',
+  // Conservar los espacios entre elementos inline al migrar a Astro 7.
+  compressHTML: true,
+  integrations: [react(), sitemap()],
 
   vite: {
     plugins: [tailwindcss()]

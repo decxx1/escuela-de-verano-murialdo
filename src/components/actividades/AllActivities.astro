@@ -101,7 +101,7 @@ function getBentoClass(actividad: Actividad, index: number): { gridClass: string
 
                             {/* Descripción con Markdown */}
                             <div 
-                                class={`text-white prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:text-white prose-headings:text-white prose-blockquote:text-gray-300 prose-a:text-white flex-1 overflow-y-auto ${isLarge ? 'prose-base' : 'prose-sm'}`}
+                                class={`rich-text rich-text-compact text-white flex-1 overflow-y-auto ${isLarge ? 'text-base' : 'text-sm'}`}
                                 set:html={actividad.DescripcionHTML}
                             />
                         </div>
