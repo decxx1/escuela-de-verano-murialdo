@@ -8,6 +8,7 @@ try {
   const response = await actividadesService.getActividades();
   actividades = response.data;
 } catch (error) {
+  if (import.meta.env.PROD) throw error;
   console.error('Error al obtener actividades:', error);
 }
 

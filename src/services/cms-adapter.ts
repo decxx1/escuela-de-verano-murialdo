@@ -31,39 +31,75 @@ export function paginate<T>(items: T[], page = 1, pageSize = 25): ContentRespons
   return { data: items.slice((page - 1) * pageSize, page * pageSize), meta: { pagination: { page, pageSize, pageCount: Math.ceil(items.length / pageSize), total: items.length } } };
 }
 
-export function adaptSnapshot(snapshot: CmsSnapshot) {
-  const sorted = (type: 'news' | 'galleries') => [...snapshot.contents[type]].sort((a, b) => a.sort_order - b.sort_order || Date.parse(b.created_at) - Date.parse(a.created_at));
-  const noticias: Noticia[] = sorted('news').map((entry) => {
-    const asset = photo(entry, entry.data.image);
-    return { ...dates(entry), Titulo: entry.title, Subtitulo: string(entry.data.subtitle), Resumen: string(entry.data.excerpt), Texto: string(entry.data.body), TextoHTML: string(entry.data.body_html),
-      Imagen: { id: entry.id, url: asset.url, formats: { small: asset.formats.small } } };
-  });
-  const albumes: Album[] = sorted('galleries').map((entry) => ({ ...dates(entry), Nombre: entry.title,
-    Fotos: records(entry.data.items).filter((item) => entry.media[string(item.asset)]).map((item) => photo(entry, item.asset, string(item.caption))) }));
-  const actividades: Actividad[] = snapshot.contents.activities.map((entry) => ({ ...dates(entry), Titulo: entry.title, Subtitulo: string(entry.data.subtitle),
-    Descripcion: string(entry.data.body), DescripcionHTML: string(entry.data.body_html), Icono: (icons as Record<string, Icono>)[string(entry.data.icon)] }));
-  const divisiones: DivisionEdad[] = snapshot.contents['age-groups'].map((entry) => ({ ...dates(entry), Titulo: entry.title,
-    Columna: records(entry.data.columns).map((column, index) => ({ id: index + 1, Division: string(column.division), Edades: string(column.ages) })) }));
-  const preguntas: PreguntaFrecuente[] = snapshot.contents.faqs.map((entry) => ({ ...dates(entry), Pregunta: entry.title, Respuesta: string(entry.data.body), RespuestaHTML: string(entry.data.body_html) }));
-  const contact = one(snapshot, 'contact');
-  const contacto: Contacto = { ...dates(contact), Telefono: string(contact.data.phone), Whatsapp: string(contact.data.whatsapp), Ubicacion: string(contact.data.location),
-    Email: string(contact.data.email), Horarios: string(contact.data.hours), Facebook: string(contact.data.facebook), Instagram: string(contact.data.instagram),
-    MapUrl: string(contact.data.map_url), MapEmbedUrl: string(contact.data.map_embed_url) };
-  const settings = one(snapshot, 'settings');
-  const form = settings.media[string(settings.data.registration_form)];
-  const ajustes: AjusteData = { ...dates(settings), HabilitarEquipo: settings.data.enable_team === true, HabilitarInscripciones: settings.data.enable_registration === true,
-    HabilitarPrecios: settings.data.enable_prices === true, ...(form ? { FormularioInscripcion: { id: settings.id, documentId: form.id, name: form.name, url: form.url, mime: form.mime_type } } : {}) };
+export function adaptNews(entry: CmsEntry): Noticia {
+  const asset = photo(entry, entry.data.image);
+  return { ...dates(entry), Titulo: entry.title, Subtitulo: string(entry.data.subtitle), Resumen: string(entry.data.excerpt), Texto: string(entry.data.body), TextoHTML: string(entry.data.body_html),
+    Imagen: { id: entry.id, url: asset.url, formats: { small: asset.formats.small } } };
+}
+
+export function adaptGallery(entry: CmsEntry): Album {
+  return { ...dates(entry), Nombre: entry.title,
+    Fotos: records(entry.data.items).filter((item) => entry.media[string(item.asset)]).map((item) => photo(entry, item.asset, string(item.caption))) };
+}
+
+export function adaptActivity(entry: CmsEntry): Actividad {
+  return { ...dates(entry), Titulo: entry.title, Subtitulo: string(entry.data.subtitle),
+    Descripcion: string(entry.data.body), DescripcionHTML: string(entry.data.body_html), Icono: (icons as Record<string, Icono>)[string(entry.data.icon)] };
+}
+
+export function adaptAgeGroup(entry: CmsEntry): DivisionEdad {
+  return { ...dates(entry), Titulo: entry.title,
+    Columna: records(entry.data.columns).map((column, index) => ({ id: index + 1, Division: string(column.division), Edades: string(column.ages) })) };
+}
+
+export function adaptFaq(entry: CmsEntry): PreguntaFrecuente {
+  return { ...dates(entry), Pregunta: entry.title, Respuesta: string(entry.data.body), RespuestaHTML: string(entry.data.body_html) };
+}
+
+export function adaptContact(entry: CmsEntry): Contacto {
+  return { ...dates(entry), Telefono: string(entry.data.phone), Whatsapp: string(entry.data.whatsapp), Ubicacion: string(entry.data.location),
+    Email: string(entry.data.email), Horarios: string(entry.data.hours), Facebook: string(entry.data.facebook), Instagram: string(entry.data.instagram),
+    MapUrl: string(entry.data.map_url), MapEmbedUrl: string(entry.data.map_embed_url) };
+}
+
+export function adaptSettings(entry: CmsEntry): AjusteData {
+  const form = entry.media[string(entry.data.registration_form)];
+  return { ...dates(entry), HabilitarEquipo: entry.data.enable_team === true, HabilitarInscripciones: entry.data.enable_registration === true,
+    HabilitarPrecios: entry.data.enable_prices === true, ...(form ? { FormularioInscripcion: { id: entry.id, documentId: form.id, name: form.name, url: form.url, mime: form.mime_type } } : {}) };
+}
+
+export function adaptSeason(entries: CmsEntry[]): Fecha | null {
   const schedule = (value: unknown): IngresoSalida[] => records(value).map((row, index) => ({ id: index + 1, Turno: string(row.shift), Ingreso: string(row.entry), Salida: string(row.exit) }));
-  const season = [...snapshot.contents.seasons].sort((a, b) => string(b.data.ends_at).localeCompare(string(a.data.ends_at)))[0];
-  const fecha: Fecha | null = season ? { ...dates(season), Temporada: season.title, Inicio: string(season.data.starts_at), Fin: string(season.data.ends_at),
+  const season = [...entries].sort((a, b) => string(b.data.ends_at).localeCompare(string(a.data.ends_at)))[0];
+  return season ? { ...dates(season), Temporada: season.title, Inicio: string(season.data.starts_at), Fin: string(season.data.ends_at),
     NoLaborables: string(season.data.non_working_days), IngresoSalida: schedule(season.data.schedule), HorariosGuardia: schedule(season.data.guard_schedule) } : null;
-  const turnos: Turno[] = snapshot.contents.prices.map((entry) => ({ ...dates(entry), Turno: string(entry.data.shift),
+}
+
+export function adaptPrice(entry: CmsEntry): Turno {
+  return { ...dates(entry), Turno: string(entry.data.shift),
     Condiciones: records(entry.data.conditions).map((condition, index): Condicion => ({ id: index + 1, Condicion: string(condition.name),
-      precios: records(condition.prices).map((price, priceIndex) => ({ id: priceIndex + 1, MedioDePago: string(price.payment_method), Precio: Number(price.amount) })) })) }));
-  const equipo: MiembroEquipo[] = snapshot.contents.team.filter((entry) => entry.media[string(entry.data.image)]).map((entry) => {
-    const asset = photo(entry, entry.data.image);
-    return { ...dates(entry), Activo: entry.data.active === true, Orden: String(entry.sort_order), Nombre: entry.title, Titulo: string(entry.data.job_title), Descripcion: string(entry.data.body),
-      Facebook: string(entry.data.facebook), Instagram: string(entry.data.instagram), Linkedin: string(entry.data.linkedin), Imagen: { id: entry.id, url: asset.url, formats: { small: asset.formats.small } } };
-  });
-  return { noticias, albumes, actividades, divisiones, preguntas, contacto, ajustes, fecha, turnos, equipo };
+      precios: records(condition.prices).map((price, priceIndex) => ({ id: priceIndex + 1, MedioDePago: string(price.payment_method), Precio: Number(price.amount) })) })) };
+}
+
+export function adaptTeamMember(entry: CmsEntry): MiembroEquipo | null {
+  if (! entry.media[string(entry.data.image)]) return null;
+  const asset = photo(entry, entry.data.image);
+  return { ...dates(entry), Activo: entry.data.active === true, Orden: String(entry.sort_order), Nombre: entry.title, Titulo: string(entry.data.job_title), Descripcion: string(entry.data.body),
+    Facebook: string(entry.data.facebook), Instagram: string(entry.data.instagram), Linkedin: string(entry.data.linkedin), Imagen: { id: entry.id, url: asset.url, formats: { small: asset.formats.small } } };
+}
+
+export function adaptSnapshot(snapshot: CmsSnapshot) {
+  const sorted = (type: 'news' | 'galleries') => [...snapshot.contents[type]].sort((a, b) => a.sort_order - b.sort_order || Date.parse(b.created_at) - Date.parse(a.created_at) || a.id - b.id);
+  return {
+    noticias: sorted('news').map(adaptNews),
+    albumes: sorted('galleries').map(adaptGallery),
+    actividades: snapshot.contents.activities.map(adaptActivity),
+    divisiones: snapshot.contents['age-groups'].map(adaptAgeGroup),
+    preguntas: snapshot.contents.faqs.map(adaptFaq),
+    contacto: adaptContact(one(snapshot, 'contact')),
+    ajustes: adaptSettings(one(snapshot, 'settings')),
+    fecha: adaptSeason(snapshot.contents.seasons),
+    turnos: snapshot.contents.prices.map(adaptPrice),
+    equipo: snapshot.contents.team.map(adaptTeamMember).filter((member) => member !== null),
+  };
 }

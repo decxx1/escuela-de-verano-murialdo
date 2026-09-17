@@ -10,7 +10,7 @@ import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.jsx';
 import FloatingButton from '@/components/FloatingButton.astro';
 import { ClientRouter } from 'astro:transitions';
-import { cmsService } from '@/services/cms';
+import { contactoService, ajusteService } from '@/services/cms';
 
 import type { Preload } from "@/types/Preload"
 
@@ -32,7 +32,7 @@ const {
 
 // Obtener la ruta actual
 const currentPath = Astro.url.pathname;
-await cmsService.getSnapshot();
+await Promise.all([contactoService.getContacto(), ajusteService.getAjustes()]);
 ---
 <!doctype html>
 <html lang="es">

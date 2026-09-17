@@ -15,6 +15,7 @@ try {
   const response = await contactoService.getContacto();
   contacto = response.data;
 } catch (error) {
+  if (import.meta.env.PROD) throw error;
   console.error('Error al obtener información de contacto:', error);
 }
 ---

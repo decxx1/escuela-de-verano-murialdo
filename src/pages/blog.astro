@@ -13,12 +13,13 @@ const preloadImages = [
 	}
 ];
 
-// Obtener noticias desde Strapi
+// Obtener todas las publicaciones para la paginación del sitio estático.
 let noticias: Noticia[] = [];
 
 try {
 	noticias = await noticiasService.getAllNoticias();
 } catch (error) {
+  if (import.meta.env.PROD) throw error;
 	console.error('Error al obtener noticias:', error);
 }
 ---

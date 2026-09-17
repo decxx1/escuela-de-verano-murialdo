@@ -13,14 +13,13 @@ const preloadImages = [
 	}
 ];
 
-// Obtener álbumes desde Strapi
-// OPTIMIZACIÓN: Aumentar pageSize para manejar más álbumes
-// Si tienes más de 100 álbumes, considera implementar paginación en la UI
+// Obtener los álbumes en lotes paginados; el build comparte esta lectura con sus rutas.
 let albumes: Album[] = [];
 
 try {
 	albumes = await galeriasService.getAllGalerias();
 } catch (error) {
+  if (import.meta.env.PROD) throw error;
 	console.error('Error al obtener álbumes:', error);
 }
 ---

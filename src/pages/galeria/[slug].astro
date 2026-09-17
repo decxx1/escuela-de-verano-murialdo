@@ -2,7 +2,7 @@
 import Layout from '@/layouts/Layout.astro';
 import Pagination from '@/components/Pagination.astro';
 import { galeriasService } from '@/services/cms';
-import type { Album, Foto } from '@/types/content';
+import type { Album } from '@/types/content';
 
 // Función para formatear fecha
 function formatearFecha(fecha: string): string {
@@ -20,38 +20,17 @@ export async function getStaticPaths() {
     const albumes = await galeriasService.getAllGalerias();
     return albumes.map((album) => ({
       params: { slug: album.documentId },
-      props: { albumId: album.documentId },
+      props: { album },
     }));
 }
 
-// Obtener parámetros
-const { albumId } = Astro.props as { albumId: string };
+const { album } = Astro.props as { album: Album };
 
 const pageSize = 10;
 
-// OPTIMIZACIÓN: Obtener el álbum completo
-// NOTA: Esto carga TODAS las fotos del álbum en el HTML
-// Para álbumes con >100 fotos, considera:
-// 1. Usar SSR con paginación real de API
-// 2. Implementar lazy loading con Intersection Observer
-// 3. Cargar fotos bajo demanda con fetch
-let album: Album;
-let todasLasFotos: Foto[] = [];
-let totalFotos = 0;
-let totalPages = 1;
-
-try {
-  const response = await galeriasService.getAlbumBySlug(albumId);
-  album = response.data;
-  todasLasFotos = album.Fotos || [];
-  
-  // Calcular paginación
-  totalFotos = todasLasFotos.length;
-  totalPages = Math.max(1, Math.ceil(totalFotos / pageSize));
-} catch (error) {
-  console.error('Error al obtener álbum:', error);
-  return Astro.redirect('/galeria');
-}
+const todasLasFotos = album.Fotos;
+const totalFotos = todasLasFotos.length;
+const totalPages = Math.max(1, Math.ceil(totalFotos / pageSize));
 
 const preloadImages = todasLasFotos.length > 0 ? [
   {

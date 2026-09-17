@@ -8,17 +8,17 @@ let inscripcionesAbiertas = false;
 let preciosHabilitados = false;
 let mostrarPrecios = false;
 try {
-    const [preciosResponse, ajustesResponse] = await Promise.all([
-    precioService.getPrecios(),
-    ajusteService.getAjustes(),
-  ]);
-  turnos = preciosResponse.data;
+  const ajustesResponse = await ajusteService.getAjustes();
   inscripcionesAbiertas = ajustesResponse.data.HabilitarInscripciones;
   preciosHabilitados = ajustesResponse.data.HabilitarPrecios;
+  if (inscripcionesAbiertas && preciosHabilitados) {
+    turnos = (await precioService.getPrecios()).data;
+  }
   
   // Mostrar precios solo si las inscripciones están abiertas Y los precios están habilitados
   mostrarPrecios = inscripcionesAbiertas === true && preciosHabilitados === true && turnos.length > 0;
 } catch (error) {
+  if (import.meta.env.PROD) throw error;
   console.error('Error al obtener precios:', error);
 }
 

@@ -8,6 +8,7 @@ try {
   const response = await preguntasFrecuentesService.getPreguntas();
   preguntas = response.data;
 } catch (error) {
+  if (import.meta.env.PROD) throw error;
   console.error('Error al obtener preguntas frecuentes:', error);
 }
 ---
