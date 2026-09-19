@@ -1,189 +1,86 @@
 ---
 import type { Noticia } from '@/types/content';
-import Pagination from '@/components/Pagination.astro';
+import { groupNewsBySeason } from '@/services/news-seasons';
 
 interface Props {
   noticias: Noticia[];
 }
 
 const { noticias } = Astro.props;
-const newsPerPage = 12;
-const totalPages = Math.ceil(noticias.length / newsPerPage);
+const seasons = groupNewsBySeason(noticias);
 
-
-// Función para formatear fecha
-function formatearFecha(fecha: string): string {
-  const date = new Date(fecha);
-  return date.toLocaleDateString('es-AR', {
+function formatDate(value: string): string {
+  return new Date(value).toLocaleDateString('es-AR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'America/Argentina/Buenos_Aires',
   });
-}
-
-// Función para truncar texto
-function truncarTexto(texto: string, maxLength: number = 150): string {
-  if (texto.length <= maxLength) return texto;
-  return texto.substring(0, maxLength).trim() + '...';
 }
 ---
 
-<section class="py-8 container mx-auto">
-    <section class="px-4 mx-auto max-w-7xl py-20 lg:px-6">
-        <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Noticias</h2>
-        <p class="mt-2 text-white text-xl text-center mb-12">Mantente informado sobre las últimas novedades de nuestra escuela de verano</p>
-        
-        <!-- Grid de Noticias -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="news-grid">
-            {noticias.map((noticia, index) => (
-                <article 
-                    class="border-2 border-secondary rounded-3xl overflow-hidden hover:shadow-secondary hover:shadow transition-all duration-300 hover:scale-[1.02] flex flex-col news-item"
-                    data-page={Math.floor(index / newsPerPage) + 1}
-                    style={index >= newsPerPage ? 'display: none;' : ''}
-                >
-                    {/* Imagen */}
-                    <a href={`/blog/${noticia.documentId}`} class="block">
-                        <div class="h-64 w-full relative overflow-hidden">
-                            <img
-                                src={noticia.Imagen.formats.small.url}
-                                alt={noticia.Titulo}
-                                width={noticia.Imagen.formats.small.width}
-                                height={noticia.Imagen.formats.small.height}
-                                class="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                                loading="lazy"
-                                transition:name={noticia.documentId}
-                            />
-                        </div>
-                    </a>
+<section class="container mx-auto px-4 py-20 sm:py-24" id="noticias" aria-labelledby="noticias-titulo">
+  <div class="mx-auto max-w-7xl">
+    <div class="mb-10 text-center sm:mb-12">
+      <h2 id="noticias-titulo" class="font-atma text-5xl font-bold text-tertiary text-outline-4">Noticias</h2>
+      <p class="mx-auto mt-3 max-w-2xl text-lg text-white/85 sm:text-xl">
+        Novedades de la escuela de verano, temporada tras temporada.
+      </p>
+    </div>
 
-                    {/* Contenido */}
-                    <div class="p-6 flex flex-col flex-1">
-                        {/* Fecha */}
-                        <time class="text-secondary text-sm font-semibold mb-2" datetime={noticia.createdAt}>
-                            {formatearFecha(noticia.createdAt)}
-                        </time>
-
-                        {/* Título */}
-                        <a href={`/blog/${noticia.documentId}`} class="block mb-3">
-                            <h3 class="text-tertiary text-outline-secondary-2 font-atma font-semibold text-2xl md:text-3xl hover:text-primary transition-colors duration-200">
-                                {noticia.Titulo}
-                            </h3>
-                        </a>
-
-                        {/* Subtítulo (opcional) */}
-                        {noticia.Subtitulo && (
-                            <p class="text-white font-semibold text-base mb-3">
-                                {noticia.Subtitulo}
-                            </p>
-                        )}
-
-                        {/* Preview del texto */}
-                        <p class="text-white/80 text-sm mb-4 flex-1">
-                            {noticia.Resumen || truncarTexto(noticia.Texto.replace(/[#*\-\[\]]/g, ''))}
-                        </p>
-
-                        {/* Botón Leer más */}
-                        <a
-                            href={`/blog/${noticia.documentId}`}
-                            class="inline-flex items-center gap-2 text-secondary hover:text-tertiary font-semibold transition-colors duration-200 mt-auto"
-                        >
-                            Leer más
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
-                        </a>
-                    </div>
-                </article>
-            ))}
-        </div>
-
-        {/* Paginación */}
-        {totalPages > 1 && (
-            <Pagination totalPages={totalPages} />
-        )}
-
-        {/* Mensaje si no hay noticias */}
-        {noticias.length === 0 && (
-            <div class="text-center py-20">
-                <div class="border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
-                    <h3 class="font-atma font-bold text-primary text-outline-2 text-3xl md:text-4xl mb-4">No hay noticias disponibles</h3>
-                    <p class="text-white text-xl">
-                        Pronto publicaremos novedades sobre nuestra escuela de verano.
-                    </p>
-                </div>
+    {noticias.length > 0 ? (
+      <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6" id="news-grid">
+        {seasons.map((season, seasonIndex) => (
+          <Fragment>
+            <div class:list={[
+              'col-span-full flex items-center gap-4',
+              seasonIndex > 0 ? 'mt-7 sm:mt-10' : '',
+            ]}>
+              <span aria-hidden="true" class="h-7 w-1 shrink-0 rounded-full bg-secondary"></span>
+              <h3 class="shrink-0 font-atma text-2xl font-bold text-white sm:text-3xl">
+                Temporada <span class="text-secondary">{season.label}</span>
+              </h3>
+              <span aria-hidden="true" class="h-px min-w-0 flex-1 bg-secondary/60"></span>
             </div>
-        )}
-    </section>
+
+            {season.noticias.map((noticia) => (
+              <article class="group overflow-hidden rounded-3xl border-2 border-secondary bg-transparent transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+                <a href={`/blog/${noticia.documentId}`} class="flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary" aria-label={`Leer noticia: ${noticia.Titulo}`}>
+                  <div class="relative aspect-[4/5] overflow-hidden bg-primary/70">
+                    <img
+                      src={noticia.Imagen.url}
+                      alt={noticia.Titulo}
+                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]"
+                      loading="lazy"
+                      decoding="async"
+                      transition:name={noticia.documentId}
+                    />
+                  </div>
+                  <div class="flex flex-1 flex-col gap-2 p-4 sm:p-5">
+                    <time class="text-xs font-bold uppercase tracking-[0.12em] text-secondary" datetime={noticia.createdAt}>
+                      {formatDate(noticia.createdAt)}
+                    </time>
+                    <h4 class="line-clamp-2 font-atma text-xl font-bold leading-snug text-white transition-colors group-hover:text-secondary">
+                      {noticia.Titulo}
+                    </h4>
+                    <span class="mt-auto inline-flex items-center gap-1.5 pt-1 text-sm font-semibold text-secondary">
+                      Leer noticia
+                      <svg class="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14m-7-7 7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </Fragment>
+        ))}
+      </div>
+    ) : (
+      <div class="mx-auto max-w-2xl rounded-3xl border border-secondary/50 bg-header p-10 text-center sm:p-12">
+        <h3 class="font-atma text-3xl font-bold text-white sm:text-4xl">No hay noticias disponibles</h3>
+        <p class="mt-3 text-lg text-white/80">Pronto publicaremos novedades sobre nuestra escuela de verano.</p>
+      </div>
+    )}
+  </div>
 </section>
-
-<script>
-  document.addEventListener('astro:page-load', () => {
-    let currentPage = 1;
-    const newsPerPage = 12;
-    const grid = document.getElementById('news-grid');
-    const newsItems = grid?.querySelectorAll('.news-item') || [];
-    const totalPages = Math.max(...Array.from(newsItems).map(n => parseInt(n.getAttribute('data-page') || '1')));
-    
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const pageNumbersContainer = document.getElementById('page-numbers');
-    const currentPageMobile = document.getElementById('current-page-mobile');
-
-    function showPage(page: number) {
-      currentPage = page;
-      
-      // Actualizar visibilidad de noticias
-      newsItems.forEach((news) => {
-        const newsPage = parseInt(news.getAttribute('data-page') || '1');
-        if (newsPage === currentPage) {
-          (news as HTMLElement).style.display = '';
-        } else {
-          (news as HTMLElement).style.display = 'none';
-        }
-      });
-
-      // Actualizar botones
-      if (prevBtn) {
-        (prevBtn as HTMLButtonElement).disabled = currentPage === 1;
-      }
-      if (nextBtn) {
-        (nextBtn as HTMLButtonElement).disabled = currentPage === totalPages;
-      }
-
-      // Actualizar indicador móvil
-      if (currentPageMobile) {
-        currentPageMobile.textContent = currentPage.toString();
-      }
-
-      // Actualizar display de paginación
-      if ((window as any).updatePaginationDisplay) {
-        (window as any).updatePaginationDisplay(currentPage);
-      }
-
-      // Scroll suave al inicio del grid
-      grid?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // Event listeners
-    prevBtn?.addEventListener('click', () => {
-      if (currentPage > 1) {
-        showPage(currentPage - 1);
-      }
-    });
-
-    nextBtn?.addEventListener('click', () => {
-      if (currentPage < totalPages) {
-        showPage(currentPage + 1);
-      }
-    });
-
-    // Delegación de eventos para botones de página
-    pageNumbersContainer?.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      if (target.classList.contains('page-btn')) {
-        const page = parseInt(target.getAttribute('data-page') || '1');
-        showPage(page);
-      }
-    });
-  });
-</script>

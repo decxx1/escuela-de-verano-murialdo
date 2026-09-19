@@ -22,7 +22,7 @@ const itemClass = "flex min-h-11 items-center rounded-xl px-3 py-2 leading-tight
 const inactiveClass = "text-white hover:bg-white/10 focus-visible:bg-white/10";
 const activeClass = "bg-secondary font-semibold text-tertiary hover:bg-background2";
 
-export default function Menu({ currentPath = "/" }) {
+export default function Menu({ currentPath = "/", showTeam = false }) {
     const sectionsId = useId();
     const isActive = (path) => path === "/"
         ? currentPath === "/"
@@ -68,7 +68,7 @@ export default function Menu({ currentPath = "/" }) {
                     </ul>
                 </Dropdown>
             </li>
-            {links.map(({ href, label }) => (
+            {links.filter(({ href }) => href !== "/equipo" || showTeam).map(({ href, label }) => (
                 <li key={href} className="w-full lg:w-auto lg:shrink-0">
                     <a
                         href={href}

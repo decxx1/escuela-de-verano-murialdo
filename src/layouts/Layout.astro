@@ -10,7 +10,7 @@ import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.jsx';
 import FloatingButton from '@/components/FloatingButton.astro';
 import { ClientRouter } from 'astro:transitions';
-import { contactoService, ajusteService } from '@/services/cms';
+import { contactoService, ajusteService, equipoService } from '@/services/cms';
 
 import type { Preload } from "@/types/Preload"
 
@@ -32,7 +32,9 @@ const {
 
 // Obtener la ruta actual
 const currentPath = Astro.url.pathname;
-await Promise.all([contactoService.getContacto(), ajusteService.getAjustes()]);
+const [, ajustesResponse] = await Promise.all([contactoService.getContacto(), ajusteService.getAjustes()]);
+const showTeam = ajustesResponse.data.HabilitarEquipo &&
+	(await equipoService.getEquipos()).data.some((miembro) => miembro.Activo);
 ---
 <!doctype html>
 <html lang="es">
@@ -87,7 +89,7 @@ await Promise.all([contactoService.getContacto(), ajusteService.getAjustes()]);
 				</div>
 			</div>
 		</div>
-		<Header client:load currentPath={currentPath} />
+		<Header client:load currentPath={currentPath} showTeam={showTeam} />
 		<main>
 			<slot />
 		</main>
@@ -154,7 +156,7 @@ await Promise.all([contactoService.getContacto(), ajusteService.getAjustes()]);
 }
 
 @media screen and (max-width: 545px) {
-	span {
+	.float-button span {
 		display: none;
 	}
 

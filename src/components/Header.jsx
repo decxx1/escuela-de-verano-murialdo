@@ -1,6 +1,6 @@
 import { useEffect,useState } from "react";
 import Menu from "@/components/Menu";
-export default function Header({ currentPath }) {
+export default function Header({ currentPath, showTeam = false }) {
 
     const [ scrolled, setScrolled ] = useState(false);
     const [ isMobile, setIsMobile ] = useState(false);
@@ -78,7 +78,7 @@ export default function Header({ currentPath }) {
                         {/* Menú móvil */}
                         <nav id="menu-movil" aria-label="Menú principal" className={`${showNavMobile ? "" : "hidden"} lg:hidden z-50 bg-header py-6 w-full max-h-[calc(100dvh-8rem)] overflow-y-auto rounded-3xl absolute left-0 top-24`}>
                             <ul className="flex flex-col items-start justify-center gap-1 text-white text-xl px-4">
-                                <Menu currentPath={currentPath} />
+                                <Menu currentPath={currentPath} showTeam={showTeam} />
                             </ul>
                         </nav>
                     </div>
@@ -86,7 +86,7 @@ export default function Header({ currentPath }) {
                     {/* Menú completo a la derecha */}
                     <nav aria-label="Menú principal" className={`${scrolled ? "pl-20" : ""} max-lg:hidden bg-header py-4 lg:py-2 xl:py-4 rounded-3xl transition-[padding-left] duration-300`}>
                         <ul className="flex items-center justify-center gap-2 xl:gap-4 2xl:gap-8 text-white text-xl lg:text-lg 2xl:text-3xl px-4 xl:px-6">
-                            <Menu currentPath={currentPath} />
+                            <Menu currentPath={currentPath} showTeam={showTeam} />
                         </ul>
                     </nav>
                 </div>
