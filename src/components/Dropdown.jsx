@@ -1,54 +1,35 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function Dropdown({ 
-    trigger, 
-    children, 
-    placement = 'bottom',
-    offsetDistance = 10,
-    className = ""
-}) {
+export default function Dropdown({ trigger, children, className = "" }) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
-    const triggerRef = useRef(null);
 
-    // Handle click outside to close dropdown
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (
-                dropdownRef.current && 
-                !dropdownRef.current.contains(event.target) &&
-                triggerRef.current &&
-                !triggerRef.current.contains(event.target)
-            ) {
+        if (!isOpen) return;
+
+        const handlePointerDown = (event) => {
+            if (!dropdownRef.current?.contains(event.target)) setIsOpen(false);
+        };
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
                 setIsOpen(false);
+                dropdownRef.current?.querySelector("button")?.focus();
             }
         };
 
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
+        document.addEventListener("pointerdown", handlePointerDown);
+        document.addEventListener("keydown", handleKeyDown);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("pointerdown", handlePointerDown);
+            document.removeEventListener("keydown", handleKeyDown);
         };
     }, [isOpen]);
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
     return (
-        <div className="relative inline-block">
-            <div ref={triggerRef} onClick={toggleDropdown}>
-                {trigger}
-            </div>
-            
+        <div ref={dropdownRef} className="relative inline-block w-full lg:w-auto">
+            {trigger({ isOpen, toggleDropdown: () => setIsOpen((open) => !open) })}
             {isOpen && (
-                <div 
-                    ref={dropdownRef}
-                    className={`absolute z-50 ${placement === 'bottom' ? 'top-full' : 'bottom-full'} left-0 ${className}`}
-                    style={{ marginTop: placement === 'bottom' ? `${offsetDistance}px` : '0', marginBottom: placement === 'top' ? `${offsetDistance}px` : '0' }}
-                >
+                <div className={`relative z-50 mt-2 lg:absolute lg:left-0 lg:top-full ${className}`}>
                     {children}
                 </div>
             )}

@@ -1,86 +1,84 @@
+import { useId } from "react";
 import Dropdown from "./Dropdown";
 
-export default function Menu1({ currentPath = '/' }) {
-    // Función para verificar si la ruta está activa
-    const isActive = (path) => {
-        if (path === '/') {
-            return currentPath === '/';
-        }
-        return currentPath.startsWith(path);
-    };
+const links = [
+    { href: "/actividades", label: "Actividades" },
+    { href: "/temporada", label: "Fechas y precios" },
+    { href: "/contacto", label: "Contacto" },
+    { href: "/galeria", label: "Fotos" },
+    { href: "/blog", label: "Noticias" },
+    { href: "/equipo", label: "Equipo" },
+];
 
-    // Clases para enlaces activos
-    const getActiveClass = (path) => {
-        return isActive(path) ? 'bg-secondary text-tertiary font-semibold' : '';
-    };
-    // Clases para enlaces activos en grupo
-    const getActiveGroupClass = (path) => {
-        return isActive(path) ? 'bg-secondary text-tertiary font-semibold' : '';
-    };
+const homeSections = [
+    { href: "/#actividades", label: "Actividades" },
+    { href: "/#nuestros-pilares", label: "Nuestros Pilares" },
+    { href: "/#edades", label: "Edades" },
+    { href: "/#sobre-nosotros", label: "Sobre Nosotros" },
+    { href: "/#preguntas-frecuentes", label: "Preguntas frecuentes" },
+];
+
+const itemClass = "flex min-h-11 items-center rounded-xl px-3 py-2 leading-tight transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary lg:min-h-10 lg:px-2";
+const inactiveClass = "text-white hover:bg-white/10 focus-visible:bg-white/10";
+const activeClass = "bg-secondary font-semibold text-tertiary hover:bg-background2";
+
+export default function Menu({ currentPath = "/" }) {
+    const sectionsId = useId();
+    const isActive = (path) => path === "/"
+        ? currentPath === "/"
+        : currentPath === path || currentPath.startsWith(`${path}/`);
 
     return (
         <>
-        <li>
-            <Dropdown
-                placement="bottom"
-                offsetDistance={10}
-                className="bg-primary divide-y divide-light rounded-xl shadow w-52 lg:w-72 xl:w-96"
-                trigger={
-                    <div className={`inline-flex items-center max-sm:w-full rounded-xl`}>
-                        <a 
-                            href="/" 
-                            className={`cursor-pointer max-sm:hover:text-primary sm:hover:bg-primary/70 sm:hover:text-white pl-2 pr-1 py-2 rounded-l-xl ${getActiveGroupClass('/')}`}
-                        >
-                            Inicio
-                        </a>
-                        <button
-                            className={`inline-flex items-center cursor-pointer sm:hover:bg-primary/70 sm:hover:text-white pl-1 pr-2 py-4 rounded-r-xl ${getActiveGroupClass('/')}`}
-                            type="button"
-                        >
-                            <svg className="size-3 2xl:size-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
-                            </svg>
-                        </button>
-                    </div>
-                }
-            >
-                <ul className="py-2 text-lg lg:text-xl xl:text-2xl text-white" >
-                    <li>
-                        <a href="/#actividades" className="block px-4 py-2 lg:py-4 hover:bg-light hover:rounded-2xl hover:text-primary">Actividades</a>
-                    </li>
-                    <li>
-                        <a href="/#nuestros-pilares" className="block px-4 py-2 lg:py-4 hover:bg-light hover:rounded-2xl hover:text-primary">Nuestros Pilares</a>
-                    </li>
-                    <li>
-                        <a href="/#edades" className="block px-4 py-2 lg:py-4 hover:bg-light hover:rounded-2xl hover:text-primary">Edades</a>
-                    </li>
-                    <li>
-                        <a href="/#sobre-nosotros" className="block px-4 py-2 lg:py-4 hover:bg-light hover:rounded-2xl hover:text-primary">Sobre Nosotros</a>
-                    </li>
-                    <li>
-                        <a href="/#preguntas-frecuentes" className="block px-4 py-2 lg:py-4 hover:bg-light hover:rounded-2xl hover:text-primary">Preguntas frecuentes</a>
-                    </li>
-                </ul>
-            </Dropdown>
-        </li>
-        <li>
-            <a href="/actividades" className={`max-sm:hover:bg-light max-sm:hover:text-primary max-sm:w-full px-2 py-2 rounded-xl sm:hover:bg-primary/70 sm:hover:text-white ${getActiveClass('/actividades')}`}>Actividades</a>
-        </li>
-        <li>
-            <a href="/temporada" className={`max-sm:hover:bg-light max-sm:hover:text-primary max-sm:w-full px-2 py-2 rounded-xl sm:hover:bg-primary/70 sm:hover:text-white ${getActiveClass('/temporada')}`}>Fechas y precios</a>
-        </li>
-        <li>
-            <a href="/contacto" className={`max-sm:hover:bg-light max-sm:hover:text-primary max-sm:w-full px-2 py-2 rounded-xl sm:hover:bg-primary/70 sm:hover:text-white ${getActiveClass('/contacto')}`}>Contacto</a>
-        </li>
-        <li>
-            <a href="/galeria" className={`max-sm:hover:bg-light max-sm:hover:text-primary max-sm:w-full px-2 py-2 rounded-xl sm:hover:bg-primary/70 sm:hover:text-white ${getActiveClass('/galeria')}`}>Fotos</a>
-        </li>
-        <li>
-            <a href="/blog" className={`max-sm:hover:bg-light max-sm:hover:text-primary max-sm:w-full px-2 py-2 rounded-xl sm:hover:bg-primary/70 sm:hover:text-white ${getActiveClass('/blog')}`}>Noticias</a>
-        </li>
-        <li>
-            <a href="/equipo" className={`max-sm:hover:bg-light max-sm:hover:text-primary max-sm:w-full px-2 py-2 rounded-xl sm:hover:bg-primary/70 sm:hover:text-white ${getActiveClass('/equipo')}`}>Equipo</a>
-        </li>
+            <li className="w-full lg:w-auto lg:shrink-0">
+                <Dropdown
+                    className="w-full rounded-2xl border border-white/10 bg-primary p-2 shadow-xl lg:w-72"
+                    trigger={({ isOpen, toggleDropdown }) => (
+                        <div className={`inline-flex min-h-11 items-stretch whitespace-nowrap overflow-hidden rounded-xl transition-colors duration-200 lg:min-h-10 ${isActive("/") ? activeClass : inactiveClass}`}>
+                            <a
+                                href="/"
+                                aria-current={isActive("/") ? "page" : undefined}
+                                className="flex items-center py-2 pl-3 pr-1 leading-tight focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary lg:pl-2"
+                            >
+                                Inicio
+                            </a>
+                            <button
+                                type="button"
+                                onClick={toggleDropdown}
+                                aria-label="Mostrar secciones de Inicio"
+                                aria-expanded={isOpen}
+                                aria-controls={sectionsId}
+                                className="flex min-w-8 items-center justify-center pr-2.5 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-secondary"
+                            >
+                                <svg className={`size-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="m1 1 4 4 4-4" />
+                                </svg>
+                            </button>
+                        </div>
+                    )}
+                >
+                    <ul id={sectionsId} className="space-y-0.5 text-base text-white lg:text-lg">
+                        {homeSections.map(({ href, label }) => (
+                            <li key={href}>
+                                <a href={href} className="block rounded-xl px-3 py-2 leading-snug transition-colors hover:bg-white/10 focus-visible:bg-white/10 focus-visible:outline-2 focus-visible:outline-secondary">
+                                    {label}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </Dropdown>
+            </li>
+            {links.map(({ href, label }) => (
+                <li key={href} className="w-full lg:w-auto lg:shrink-0">
+                    <a
+                        href={href}
+                        aria-current={isActive(href) ? "page" : undefined}
+                        className={`${itemClass} whitespace-nowrap ${isActive(href) ? activeClass : inactiveClass}`}
+                    >
+                        {label}
+                    </a>
+                </li>
+            ))}
         </>
-    )
+    );
 }
