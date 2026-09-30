@@ -50,6 +50,7 @@ export interface AjusteData extends ContentDates {
   HabilitarEquipo: boolean;
   HabilitarInscripciones: boolean;
   HabilitarPrecios: boolean;
+  TituloPrecios: string;
   FormularioInscripcion?: ArchivoFormulario;
 }
 export interface Icono {

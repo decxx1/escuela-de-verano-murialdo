@@ -2,15 +2,17 @@
 import { precioService, ajusteService } from '@/services/cms';
 import type { Turno } from '@/types/content';
 
-// Obtener los precios desde Strapi durante el build
+// Obtener los precios publicados en el CMS durante el build
 let turnos: Turno[] = [];
 let inscripcionesAbiertas = false;
 let preciosHabilitados = false;
 let mostrarPrecios = false;
+let tituloPrecios = '';
 try {
   const ajustesResponse = await ajusteService.getAjustes();
   inscripcionesAbiertas = ajustesResponse.data.HabilitarInscripciones;
   preciosHabilitados = ajustesResponse.data.HabilitarPrecios;
+  tituloPrecios = ajustesResponse.data.TituloPrecios;
   if (inscripcionesAbiertas && preciosHabilitados) {
     turnos = (await precioService.getPrecios()).data;
   }
@@ -28,7 +30,7 @@ function formatearPrecio(precio: number): string {
     style: 'currency',
     currency: 'ARS',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(precio);
 }
 ---
@@ -38,7 +40,10 @@ function formatearPrecio(precio: number): string {
         {mostrarPrecios ? (
             <>
                 <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Precios</h2>
-                <p class="mt-2 text-white text-xl text-center mb-12">Conocé los precios según tu condición y turno elegido</p>
+                <p class:list={['mt-2 text-white text-xl text-center', tituloPrecios ? 'mb-6' : 'mb-12']}>Conocé los precios según tu condición y turno elegido</p>
+                {tituloPrecios && (
+                    <h3 class="font-atma font-bold text-secondary text-2xl md:text-3xl text-center mb-10">{tituloPrecios}</h3>
+                )}
                 
                 <!-- Tabs Container -->
                 <div class="bg-transparent rounded-3xl overflow-hidden">

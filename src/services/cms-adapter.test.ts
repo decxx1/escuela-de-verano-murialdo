@@ -47,6 +47,7 @@ test('reproduces disabled registrations, hidden team and unavailable season with
   expect(ajustes.HabilitarEquipo).toBe(false);
   expect(ajustes.HabilitarInscripciones).toBe(false);
   expect(ajustes.HabilitarPrecios).toBe(false);
+  expect(ajustes.TituloPrecios).toBe('');
   expect(fecha).toBeNull();
   expect(turnos).toEqual([]);
   expect(contacto.Horarios).toBe('Lunes\nSábado');
@@ -57,6 +58,22 @@ test('omits gallery files explicitly hidden from the public media response', () 
   const data = snapshot();
   data.contents.galleries = [withPhoto(entry('galleries', 1, { items: [{ asset: 'visible' }, { asset: 'hidden' }] }), 'visible')];
   expect(adaptSnapshot(data).albumes[0].Fotos.length).toBe(1);
+});
+
+test('uses one shared prices heading and retains each turn with its conditions and payment amounts', () => {
+  const data = snapshot();
+  data.contents.settings[0].data.prices_heading = '  Precios promocionales de octubre  ';
+  data.contents.prices = ['Turno mañana', 'Turno tarde'].map((shift, index) => ({
+    ...entry('prices', index + 1, { shift, currency: 'ARS',
+      conditions: [{ name: 'Socios', prices: [{ payment_method: 'Efectivo', amount: '12000.50' }] }] }),
+    title: `Nombre anterior del registro ${index}`,
+  }));
+
+  const { ajustes, turnos } = adaptSnapshot(data);
+  expect(ajustes.TituloPrecios).toBe('Precios promocionales de octubre');
+  expect(turnos.map((turno) => turno.Turno)).toEqual(['Turno mañana', 'Turno tarde']);
+  expect(turnos[0].Condiciones[0]).toEqual({ id: 1, Condicion: 'Socios',
+    precios: [{ id: 1, MedioDePago: 'Efectivo', Precio: 12000.5 }] });
 });
 
 test('requires published contact and settings and validates pagination', () => {

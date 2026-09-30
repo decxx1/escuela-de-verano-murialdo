@@ -65,7 +65,8 @@ export function adaptContact(entry: CmsEntry): Contacto {
 export function adaptSettings(entry: CmsEntry): AjusteData {
   const form = entry.media[string(entry.data.registration_form)];
   return { ...dates(entry), HabilitarEquipo: entry.data.enable_team === true, HabilitarInscripciones: entry.data.enable_registration === true,
-    HabilitarPrecios: entry.data.enable_prices === true, ...(form ? { FormularioInscripcion: { id: entry.id, documentId: form.id, name: form.name, url: form.url, mime: form.mime_type } } : {}) };
+    HabilitarPrecios: entry.data.enable_prices === true, TituloPrecios: string(entry.data.prices_heading).trim(),
+    ...(form ? { FormularioInscripcion: { id: entry.id, documentId: form.id, name: form.name, url: form.url, mime: form.mime_type } } : {}) };
 }
 
 export function adaptSeason(entries: CmsEntry[]): Fecha | null {
