@@ -125,31 +125,6 @@ function formatearFecha(fechaISO: string): string {
                     <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl mb-4">Fechas que no se trabajan:</h3>
                     <p class="text-white text-lg">{fecha.NoLaborables}</p>
                 </article>
-
-                <!-- Botón de Descarga del Formulario -->
-                {formularioInscripcion && (
-                    <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300 bg-linear-to-br from-secondary/10 to-transparent">
-                        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div class="flex-1 text-center md:text-left">
-                                <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl mb-2">Formulario de Inscripción</h3>
-                                <p class="text-white text-lg mb-2">Descargá el formulario para completar tu inscripción</p>
-                                <p class="text-white/70 text-sm">Archivo: {formularioInscripcion.name}</p>
-                            </div>
-                            <a 
-                                href={`${formularioInscripcion.url}`}
-                                download={formularioInscripcion.name}
-                                class="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-primary font-bold py-4 px-8 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/50 group"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                    <polyline points="7 10 12 15 17 10"/>
-                                    <line x1="12" y1="15" x2="12" y2="3"/>
-                                </svg>
-                                <span class="text-lg">Descargar Formulario</span>
-                            </a>
-                        </div>
-                    </article>
-                )}
             </>
         ) : inscripcionesAbiertas === false ? (
             <div class="text-center py-20">
@@ -171,5 +146,29 @@ function formatearFecha(fechaISO: string): string {
                 </div>
             </div>
         ) : null}
+
+        {inscripcionesAbiertas && formularioInscripcion && (
+            <article class={`border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300 bg-linear-to-br from-secondary/10 to-transparent ${mostrarFechas && fecha ? 'mt-6' : ''}`}>
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex-1 text-center md:text-left">
+                        <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl mb-2">Formulario de Inscripción</h3>
+                        <p class="text-white text-lg mb-2">Descargá el formulario para completar tu inscripción</p>
+                        <p class="text-white/70 text-sm">Archivo: {formularioInscripcion.name}</p>
+                    </div>
+                    <a 
+                        href={`${formularioInscripcion.url}`}
+                        download={formularioInscripcion.name}
+                        class="inline-flex items-center gap-3 bg-secondary hover:bg-secondary/90 text-primary font-bold py-4 px-8 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-secondary/50 group"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 group-hover:animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span class="text-lg">Descargar Formulario</span>
+                    </a>
+                </div>
+            </article>
+        )}
     </section>
 </section>
