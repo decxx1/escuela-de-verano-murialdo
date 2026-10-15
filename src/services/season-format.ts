@@ -10,5 +10,5 @@ export function formatSeasonDate(date: string): string {
 }
 
 export function formatScheduleTime(time: string, until?: string): string {
-  return until ? `De ${time} a ${until}` : time;
+  return `${until ? `De ${time} a ${until}` : time}\u00a0hs`;
 }

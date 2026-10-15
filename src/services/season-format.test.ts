@@ -14,8 +14,8 @@ test('writes full season dates without shifting the calendar day in Argentina', 
 });
 
 test('displays a range only when its optional end is present', () => {
-  expect(formatScheduleTime('13:00', '13:30')).toBe('De 13:00 a 13:30');
-  expect(formatScheduleTime('18:00', '18:30')).toBe('De 18:00 a 18:30');
-  expect(formatScheduleTime('09:00')).toBe('09:00');
-  expect(formatScheduleTime('09:00', '')).toBe('09:00');
+  expect(formatScheduleTime('13:00', '13:30')).toBe('De 13:00 a 13:30\u00a0hs');
+  expect(formatScheduleTime('18:00', '18:30')).toBe('De 18:00 a 18:30\u00a0hs');
+  expect(formatScheduleTime('09:00')).toBe('09:00\u00a0hs');
+  expect(formatScheduleTime('09:00', '')).toBe('09:00\u00a0hs');
 });
