@@ -70,7 +70,8 @@ export function adaptSettings(entry: CmsEntry): AjusteData {
 }
 
 export function adaptSeason(entries: CmsEntry[]): Fecha | null {
-  const schedule = (value: unknown): IngresoSalida[] => records(value).map((row, index) => ({ id: index + 1, Turno: string(row.shift), Ingreso: string(row.entry), Salida: string(row.exit) }));
+  const schedule = (value: unknown): IngresoSalida[] => records(value).map((row, index) => ({ id: index + 1, Turno: string(row.shift),
+    Ingreso: string(row.entry), IngresoHasta: string(row.entry_until), Salida: string(row.exit), SalidaHasta: string(row.exit_until) }));
   const season = [...entries].sort((a, b) => string(b.data.ends_at).localeCompare(string(a.data.ends_at)))[0];
   return season ? { ...dates(season), Temporada: season.title, Inicio: string(season.data.starts_at), Fin: string(season.data.ends_at),
     NoLaborables: string(season.data.non_working_days), IngresoSalida: schedule(season.data.schedule), HorariosGuardia: schedule(season.data.guard_schedule) } : null;

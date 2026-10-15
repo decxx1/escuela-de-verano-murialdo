@@ -54,6 +54,22 @@ test('reproduces disabled registrations, hidden team and unavailable season with
   expect(contacto.MapEmbedUrl).toStartWith('https://www.google.com/maps/embed?');
 });
 
+test('retains optional entry and exit ranges in both schedules and supports existing single times', () => {
+  const data = snapshot();
+  data.contents.seasons = [entry('seasons', 1, { starts_at: '2026-12-09', ends_at: '2027-02-19',
+    schedule: [
+      { shift: 'Mañana', entry: '09:00', exit: '13:00' },
+      { shift: 'Tarde', entry: '13:00', entry_until: '13:30', exit: '17:30', exit_until: '18:00' },
+    ],
+    guard_schedule: [{ shift: 'Tarde', entry: '13:00', entry_until: '13:30', exit: '18:00', exit_until: '18:30' }],
+  })];
+
+  const fecha = adaptSnapshot(data).fecha!;
+  expect(fecha.IngresoSalida[0]).toEqual({ id: 1, Turno: 'Mañana', Ingreso: '09:00', IngresoHasta: '', Salida: '13:00', SalidaHasta: '' });
+  expect(fecha.IngresoSalida[1]).toEqual({ id: 2, Turno: 'Tarde', Ingreso: '13:00', IngresoHasta: '13:30', Salida: '17:30', SalidaHasta: '18:00' });
+  expect(fecha.HorariosGuardia[0]).toEqual({ id: 1, Turno: 'Tarde', Ingreso: '13:00', IngresoHasta: '13:30', Salida: '18:00', SalidaHasta: '18:30' });
+});
+
 test('omits gallery files explicitly hidden from the public media response', () => {
   const data = snapshot();
   data.contents.galleries = [withPhoto(entry('galleries', 1, { items: [{ asset: 'visible' }, { asset: 'hidden' }] }), 'visible')];

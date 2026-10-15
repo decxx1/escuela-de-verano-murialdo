@@ -65,7 +65,7 @@ export interface Actividad extends ContentDates {
   DescripcionHTML: string;
   Icono?: Icono;
 }
-export interface IngresoSalida { id: number; Turno: string; Ingreso: string; Salida: string }
+export interface IngresoSalida { id: number; Turno: string; Ingreso: string; IngresoHasta?: string; Salida: string; SalidaHasta?: string }
 export interface Fecha extends ContentDates {
   Temporada: string;
   Inicio: string;

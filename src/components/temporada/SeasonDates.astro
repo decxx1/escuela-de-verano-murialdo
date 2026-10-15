@@ -1,8 +1,9 @@
 ---
 import { fechaService, ajusteService } from '@/services/cms';
+import { formatSeasonDate, formatScheduleTime } from '@/services/season-format';
 import type { Fecha, ArchivoFormulario } from '@/types/content';
 
-// Obtener las fechas de temporada y estado de inscripción desde Strapi
+// Obtener las fechas de temporada y estado de inscripción desde el CMS
 let fecha: Fecha | null = null;
 let inscripcionesAbiertas = false;
 let formularioInscripcion: ArchivoFormulario | null = null;
@@ -31,13 +32,6 @@ try {
   console.error('Error al obtener fechas de temporada:', error);
 }
 
-// Función para formatear fechas en formato legible
-function formatearFecha(fechaISO: string): string {
-  const fecha = new Date(fechaISO);
-  const dia = fecha.getDate();
-  const mes = fecha.getMonth() + 1;
-  return `${dia}/${mes}`;
-}
 ---
 
 <section class="pb-8 pt-28 container mx-auto">
@@ -52,13 +46,13 @@ function formatearFecha(fechaISO: string): string {
                     <!-- Inicio de Temporada -->
                     <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
                         <h3 class="text-primary text-outline-2 font-atma font-bold text-3xl mb-4">Inicio de temporada:</h3>
-                        <p class="text-white text-5xl font-bold">{formatearFecha(fecha.Inicio)}</p>
+                        <p class="text-white text-2xl sm:text-3xl md:text-2xl xl:text-3xl leading-tight font-bold"><time datetime={fecha.Inicio}>{formatSeasonDate(fecha.Inicio)}</time></p>
                     </article>
 
                     <!-- Fin de Temporada -->
                     <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow-secondary hover:shadow transition-all duration-300">
                         <h3 class="text-primary text-outline-2 font-atma font-bold text-3xl mb-4">Fin de temporada:</h3>
-                        <p class="text-white text-5xl font-bold">{formatearFecha(fecha.Fin)}</p>
+                        <p class="text-white text-3xl sm:text-3xl md:text-2xl xl:text-3xl leading-tight font-bold"><time datetime={fecha.Fin}>{formatSeasonDate(fecha.Fin)}</time></p>
                     </article>
                 </div>
 
@@ -66,26 +60,26 @@ function formatearFecha(fechaISO: string): string {
                     <!-- Horarios de Ingreso y Salida -->
                     <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow transition-all duration-300">
                         <div class="flex items-center gap-3 mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 shrink-0 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"/>
                                 <polyline points="12 6 12 12 16 14"/>
                             </svg>
                             <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Horarios de Ingreso y Salida</h3>
                         </div>
-                        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2 gap-6">
                             {fecha.IngresoSalida.map((horario) => (
-                                <div class="mb-6 last:mb-0">
+                                <div class="min-w-0">
                                     <h4 class="text-secondary font-bold text-xl mb-3">{horario.Turno}</h4>
-                                    
-                                    <div class="mb-2">
-                                        <p class="text-white font-semibold text-base">Ingreso:</p>
-                                        <p class="text-white text-base">{horario.Ingreso}</p>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-white font-semibold text-base">Salida:</p>
-                                        <p class="text-white text-base">{horario.Salida}</p>
-                                    </div>
+                                    <dl class="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
+                                        <div>
+                                            <dt class="text-white font-semibold text-base">Ingreso:</dt>
+                                            <dd class="text-white text-base">{formatScheduleTime(horario.Ingreso, horario.IngresoHasta)}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-white font-semibold text-base">Salida:</dt>
+                                            <dd class="text-white text-base">{formatScheduleTime(horario.Salida, horario.SalidaHasta)}</dd>
+                                        </div>
+                                    </dl>
                                 </div>
                             ))}
                         </section>
@@ -94,26 +88,26 @@ function formatearFecha(fechaISO: string): string {
                     <!-- Horarios de Guardia -->
                     <article class="border-2 border-secondary rounded-3xl p-8 hover:shadow transition-all duration-300">
                         <div class="flex items-center gap-3 mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 shrink-0 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"/>
                                 <polyline points="12 6 12 12 16 14"/>
                             </svg>
                             <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl">Horarios de Guardia</h3>
                         </div>
-                        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 xl:grid-cols-2 gap-6">
                             {fecha.HorariosGuardia.map((horario) => (
-                                <div class="mb-6 last:mb-0">
+                                <div class="min-w-0">
                                     <h4 class="text-secondary font-bold text-xl mb-3">{horario.Turno}</h4>
-                                    
-                                    <div class="mb-2">
-                                        <p class="text-white font-semibold text-base">Entrada:</p>
-                                        <p class="text-white text-base">{horario.Ingreso}</p>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-white font-semibold text-base">Salida:</p>
-                                        <p class="text-white text-base">{horario.Salida}</p>
-                                    </div>
+                                    <dl class="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
+                                        <div>
+                                            <dt class="text-white font-semibold text-base">Entrada:</dt>
+                                            <dd class="text-white text-base">{formatScheduleTime(horario.Ingreso, horario.IngresoHasta)}</dd>
+                                        </div>
+                                        <div>
+                                            <dt class="text-white font-semibold text-base">Salida:</dt>
+                                            <dd class="text-white text-base">{formatScheduleTime(horario.Salida, horario.SalidaHasta)}</dd>
+                                        </div>
+                                    </dl>
                                 </div>
                             ))}
                         </section>
