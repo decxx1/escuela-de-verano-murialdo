@@ -1,0 +1,10 @@
+---
+import SeasonPage from '@/components/temporada/SeasonPage.astro';
+import { seasonSections } from '@/services/season-content';
+
+export function getStaticPaths() {
+    return seasonSections.map(section => ({ params: { section: section.id }, props: { section: section.id } }));
+}
+---
+
+<SeasonPage section={Astro.props.section} />

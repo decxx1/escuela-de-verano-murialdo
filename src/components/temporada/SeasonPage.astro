@@ -1,0 +1,70 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { fechaService, ajusteService, precioService } from '@/services/cms';
+import { availableSeasonSections, seasonSections, type SeasonSection } from '@/services/season-content';
+import type { Fecha, AjusteData, Turno } from '@/types/content';
+import SeasonDates from './SeasonDates.astro';
+import Prices from './Prices.astro';
+import Registration from './Registration.astro';
+
+interface Props { section?: SeasonSection }
+const { section } = Astro.props;
+let temporada: Fecha | null = null;
+let ajustes: AjusteData | null = null;
+let turnos: Turno[] = [];
+try {
+    temporada = (await fechaService.getFecha()).data;
+    if (temporada) {
+        ajustes = (await ajusteService.getAjustes()).data;
+        if (ajustes.HabilitarPrecios) turnos = (await precioService.getPrecios()).data;
+    }
+} catch (error) {
+    if (import.meta.env.PROD) throw error;
+    console.error('Error al obtener la temporada:', error);
+}
+
+const tabs = availableSeasonSections(temporada, ajustes, turnos);
+const active = section ? tabs.find(tab => tab.id === section) : tabs[0];
+const currentSection = section ? seasonSections.find(tab => tab.id === section) : active;
+const canonical = `https://escueladeveranomurialdo.com.ar${currentSection?.href || '/temporada'}`;
+const descriptions = {
+    'fechas-y-horarios': 'Consultá las fechas y los horarios de la escuela de verano.',
+    precios: 'Conocé los precios según tu condición y turno elegido.',
+    inscripcion: 'Encontrá el formulario para inscribirte a la escuela de verano.',
+};
+---
+
+<Layout title={`Escuela de verano - ${currentSection?.label || 'Temporada'}`} canonical={canonical} metaDescription={currentSection ? descriptions[currentSection.id] : 'Toda la información de la temporada de la escuela de verano Murialdo.'} metaImg="https://escueladeveranomurialdo.com.ar/images/temporada.webp" preLoad={[{ href: '/images/temporada.webp', as: 'image', type: 'image/webp' }]}>
+    <Breadcrumb title="Temporada" img="/images/temporada.webp" />
+    <section id="temporada-info" class="container mx-auto px-4 lg:px-6 pt-16 sm:pt-20 pb-16 sm:pb-24 max-w-7xl scroll-mt-24" aria-labelledby="season-heading">
+        {temporada ? (
+            <>
+                <h2 id="season-heading" class="font-atma font-bold text-outline-4 text-tertiary text-4xl sm:text-5xl text-center">Temporada {temporada.Temporada}</h2>
+                {tabs.length > 0 && (
+                    <nav aria-label="Información de la temporada" class:list={['mt-8 mb-10 sm:mb-12 mx-auto max-w-3xl grid gap-1.5 sm:gap-2 rounded-2xl border border-white/15 bg-white/5 p-1.5 sm:p-2', { 'grid-cols-1': tabs.length === 1, 'grid-cols-2': tabs.length === 2, 'grid-cols-3': tabs.length === 3 }]}>
+                        {tabs.map(tab => (
+                            <a href={`${tab.href}#temporada-info`} aria-current={active?.id === tab.id ? 'page' : undefined} class:list={['flex min-h-14 items-center justify-center rounded-xl px-2 sm:px-5 py-3 text-center text-sm sm:text-lg leading-snug font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary', active?.id === tab.id ? 'bg-secondary text-primary shadow-sm' : 'text-white/80 hover:bg-white/10 hover:text-white']}>
+                                {tab.label}
+                            </a>
+                        ))}
+                    </nav>
+                )}
+                {active ? (
+                    <section aria-label={active.label}>
+                        {active.id === 'fechas-y-horarios' && <SeasonDates fecha={temporada} />}
+                        {active.id === 'precios' && <Prices turnos={turnos} tituloPrecios={ajustes?.TituloPrecios || ''} />}
+                        {active.id === 'inscripcion' && ajustes?.FormularioInscripcion && <Registration formulario={ajustes.FormularioInscripcion} />}
+                    </section>
+                ) : (
+                    <p class="mt-10 text-center text-white/80 text-lg leading-relaxed max-w-xl mx-auto">{tabs.length ? 'Esta sección todavía no está disponible. Elegí una de las opciones de la temporada.' : 'Estamos preparando la información de esta temporada. Pronto compartiremos las novedades.'}</p>
+                )}
+            </>
+        ) : (
+            <div class="rounded-3xl border border-white/15 bg-white/5 p-8 sm:p-12 text-center max-w-2xl mx-auto">
+                <h2 id="season-heading" class="font-atma font-bold text-secondary text-3xl sm:text-4xl mb-4">¡Nos vemos en la próxima temporada!</h2>
+                <p class="text-white/80 text-lg leading-relaxed">Pronto anunciaremos la temporada de la escuela de verano. Seguinos en nuestras redes sociales para conocer las novedades.</p>
+            </div>
+        )}
+    </section>
+</Layout>

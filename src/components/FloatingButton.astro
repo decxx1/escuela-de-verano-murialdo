@@ -1,5 +1,5 @@
 ---
-import { contactoService, ajusteService } from '@/services/cms';
+import { contactoService, ajusteService, fechaService } from '@/services/cms';
 import type { ArchivoFormulario } from '@/types/content';
 
 // Obtener datos de contacto y ajustes desde Strapi
@@ -11,9 +11,10 @@ let mostrarFormulario = false;
 let inscripcionesAbiertas = false;
 
 try {
-  const [contactoResponse, ajustesResponse] = await Promise.all([
+  const [contactoResponse, ajustesResponse, fechaResponse] = await Promise.all([
     contactoService.getContacto(),
     ajusteService.getAjustes(),
+    fechaService.getFecha(),
   ]);
   
   const contacto = contactoResponse.data;
@@ -22,7 +23,7 @@ try {
   mapUrl = contacto.MapUrl || '';
   
   const ajustes = ajustesResponse.data;
-  inscripcionesAbiertas = ajustes.HabilitarInscripciones;
+  inscripcionesAbiertas = ajustes.HabilitarInscripciones && fechaResponse.data !== null;
   formularioInscripcion = ajustes.FormularioInscripcion || null;
   
   // Mostrar botón de formulario solo si hay formulario Y las inscripciones están abiertas
@@ -92,7 +93,7 @@ try {
 <!-- Botón Inscribite (centrado abajo) -->
 {inscripcionesAbiertas && (
     <div class="inscribite-button-container">
-        <a href="/temporada" class="inscribite-button shrink-0">
+        <a href={mostrarFormulario ? '/temporada/inscripcion' : '/temporada'} class="inscribite-button shrink-0">
             <div class="inscribite-text">Inscribite</div>
             <svg class="inscribite-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M5 12h14"/>

@@ -1,192 +1,91 @@
 ---
-import { precioService, ajusteService } from '@/services/cms';
 import type { Turno } from '@/types/content';
 
-// Obtener los precios publicados en el CMS durante el build
-let turnos: Turno[] = [];
-let inscripcionesAbiertas = false;
-let preciosHabilitados = false;
-let mostrarPrecios = false;
-let tituloPrecios = '';
-try {
-  const ajustesResponse = await ajusteService.getAjustes();
-  inscripcionesAbiertas = ajustesResponse.data.HabilitarInscripciones;
-  preciosHabilitados = ajustesResponse.data.HabilitarPrecios;
-  tituloPrecios = ajustesResponse.data.TituloPrecios;
-  if (inscripcionesAbiertas && preciosHabilitados) {
-    turnos = (await precioService.getPrecios()).data;
-  }
-  
-  // Mostrar precios solo si las inscripciones están abiertas Y los precios están habilitados
-  mostrarPrecios = inscripcionesAbiertas === true && preciosHabilitados === true && turnos.length > 0;
-} catch (error) {
-  if (import.meta.env.PROD) throw error;
-  console.error('Error al obtener precios:', error);
-}
-
-// Función para formatear precios
-function formatearPrecio(precio: number): string {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(precio);
-}
+interface Props { turnos: Turno[]; tituloPrecios?: string }
+const { turnos, tituloPrecios = '' } = Astro.props;
+const currency = new Intl.NumberFormat('es-AR', {
+    style: 'currency', currency: 'ARS', minimumFractionDigits: 0, maximumFractionDigits: 2,
+});
 ---
 
-<section class="py-8 container mx-auto">
-    <section class="px-4 mx-auto max-w-7xl sm:py-20 lg:px-6">
-        {mostrarPrecios ? (
-            <>
-                <h2 class="font-atma font-bold text-outline-4 text-tertiary text-5xl text-center mb-4">Precios</h2>
-                <p class:list={['mt-2 text-white text-xl text-center', tituloPrecios ? 'mb-6' : 'mb-12']}>Conocé los precios según tu condición y turno elegido</p>
-                {tituloPrecios && (
-                    <h3 class="font-atma font-bold text-secondary text-2xl md:text-3xl text-center mb-10">{tituloPrecios}</h3>
-                )}
-                
-                <!-- Tabs Container -->
-                <div class="bg-transparent rounded-3xl overflow-hidden">
-                    <!-- Tab Headers -->
-                    <div class="flex flex-wrap gap-2 mb-6 justify-center">
-                        {turnos.map((turno, index) => (
-                            <button
-                                class={`tab-button cursor-pointer px-8 py-4 rounded-2xl font-atma font-bold text-xl md:text-2xl transition-all duration-300 border-2 ${
-                                    index === 0 
-                                        ? 'bg-secondary border-secondary text-primary' 
-                                        : 'bg-transparent border-secondary text-white hover:bg-secondary/20'
-                                }`}
-                                data-tab={`tab-${index}`}
-                                data-index={index}
-                            >
-                                {turno.Turno}
-                            </button>
-                        ))}
-                    </div>
+<div data-price-tabs>
+    <p class:list={['text-white/85 text-lg sm:text-xl text-center', tituloPrecios ? 'mb-4' : 'mb-8']}>Conocé los precios según tu condición y turno elegido</p>
+    {tituloPrecios && <h3 class="font-atma font-bold text-secondary text-2xl md:text-3xl text-center mb-8">{tituloPrecios}</h3>}
 
-                    <!-- Tab Contents -->
-                    <div class="tab-contents">
-                        {turnos.map((turno, turnoIndex) => (
-                            <div
-                                class={`tab-content ${turnoIndex === 0 ? 'active' : ''}`}
-                                data-tab={`tab-${turnoIndex}`}
-                            >
-                                <!-- Grid de Condiciones -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {turno.Condiciones.map((condicion) => (
-                                        <article class="border-2 border-secondary rounded-3xl p-6 hover:shadow-secondary hover:shadow transition-all duration-300 flex flex-col">
-                                            {/* Header de la Condición */}
-                                            <div class="mb-6 pb-4 border-b-2 border-secondary/30">
-                                                <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl text-center">
-                                                    {condicion.Condicion}
-                                                </h3>
-                                            </div>
+    <div role="tablist" aria-label="Turno de la escuela de verano" class="flex flex-wrap gap-2 mb-8 justify-center">
+        {turnos.map((turno, index) => (
+            <button
+                id={'price-tab-' + index}
+                type="button"
+                role="tab"
+                aria-selected={index === 0 ? 'true' : 'false'}
+                aria-controls={'price-panel-' + index}
+                tabindex={index === 0 ? 0 : -1}
+                class="cursor-pointer px-5 sm:px-8 py-3 rounded-2xl font-atma font-bold text-xl md:text-2xl transition-colors border-2 border-secondary/60 text-white hover:bg-secondary/15 aria-selected:bg-secondary aria-selected:border-secondary aria-selected:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary"
+            >{turno.Turno}</button>
+        ))}
+    </div>
 
-                                            {/* Lista de Precios */}
-                                            <div class="space-y-4 flex-1">
-                                                {condicion.precios.map((precioDetalle) => (
-                                                    <div class="bg-primary/5 rounded-xl p-4 hover:bg-primary/10 transition-colors duration-200">
-                                                        <div class="flex justify-between items-center">
-                                                            <div>
-                                                                <p class="text-white font-semibold text-base md:text-lg">
-                                                                    {precioDetalle.MedioDePago}
-                                                                </p>
-                                                            </div>
-                                                            <div>
-                                                                <p class="text-secondary font-bold text-xl md:text-2xl">
-                                                                    {formatearPrecio(precioDetalle.Precio)}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </article>
-                                    ))}
+    {turnos.map((turno, turnoIndex) => (
+        <div id={'price-panel-' + turnoIndex} role="tabpanel" aria-labelledby={'price-tab-' + turnoIndex} tabindex="0" hidden={turnoIndex !== 0} class="rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {turno.Condiciones.map(condicion => (
+                    <article class="border-2 border-secondary rounded-3xl p-5 sm:p-6 flex flex-col">
+                        <div class="mb-5 pb-4 border-b border-secondary/30">
+                            <h3 class="text-primary text-outline-2 font-atma font-bold text-2xl md:text-3xl text-center">{condicion.Condicion}</h3>
+                        </div>
+                        <dl class="space-y-4 flex-1">
+                            {condicion.precios.map(precio => (
+                                <div class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-4">
+                                    <dt class="min-w-0 break-words text-white font-semibold text-base md:text-lg">{precio.MedioDePago}</dt>
+                                    <dd class="text-secondary font-bold text-xl md:text-2xl text-right whitespace-nowrap">{currency.format(precio.Precio)}</dd>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <!-- Nota informativa -->
-                <div class="mt-8 border-2 border-secondary/50 rounded-2xl p-6 bg-primary/5">
-                    <p class="text-white text-center text-sm md:text-base">
-                        <span class="font-bold text-secondary">Nota:</span> Los precios están sujetos a cambios. 
-                        Para más información sobre descuentos por hermanos o promociones especiales, contactanos directamente.
-                    </p>
-                </div>
-            </>
-        ) : (
-            <div class="text-center py-20">
-                <!-- Mensaje cuando no hay precios -->
-                <div class="bg-light border-2 border-primary rounded-3xl p-12 max-w-2xl mx-auto">
-                    <h2 class="font-atma font-bold text-primary text-3xl md:text-4xl mb-4">Precios no disponibles</h2>
-                    <p class="text-primary/70 text-xl">
-                        Los precios de la temporada serán anunciados próximamente.
-                    </p>
-                </div>
+                            ))}
+                        </dl>
+                    </article>
+                ))}
             </div>
-        )}
-    </section>
-</section>
+        </div>
+    ))}
+
+    <div class="mt-8 border border-secondary/40 rounded-2xl p-5">
+        <p class="text-white/85 text-center text-sm md:text-base leading-relaxed">
+            <span class="font-bold text-secondary">Nota:</span> Los precios están sujetos a cambios.
+            Para más información sobre descuentos por hermanos o promociones especiales, contactanos directamente.
+        </p>
+    </div>
+</div>
 
 <script>
-    // Script para manejar las pestañas
-    document.addEventListener('astro:page-load', () => {
-        const tabButtons = document.querySelectorAll('.tab-button');
-        const tabContents = document.querySelectorAll('.tab-content');
-
-        tabButtons.forEach((button) => {
-            button.addEventListener('click', () => {
-                const targetTab = button.getAttribute('data-tab');
-                const index = button.getAttribute('data-index');
-
-                // Remover clases activas de todos los botones
-                tabButtons.forEach((btn) => {
-                    btn.classList.remove('bg-secondary', 'border-secondary', 'text-primary');
-                    btn.classList.add('bg-transparent', 'border-secondary', 'text-white');
+    function initializePriceTabs() {
+        document.querySelectorAll<HTMLElement>('[data-price-tabs]').forEach(root => {
+            if (root.dataset.initialized) return;
+            root.dataset.initialized = 'true';
+            const buttons = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+            const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+            function activate(index: number) {
+                buttons.forEach((button, buttonIndex) => {
+                    button.setAttribute('aria-selected', String(buttonIndex === index));
+                    button.tabIndex = buttonIndex === index ? 0 : -1;
                 });
-
-                // Agregar clases activas al botón clickeado
-                button.classList.remove('bg-transparent', 'text-white');
-                button.classList.add('bg-secondary', 'text-primary');
-
-                // Ocultar todos los contenidos
-                tabContents.forEach((content) => {
-                    content.classList.remove('active');
+                panels.forEach((panel, panelIndex) => { panel.hidden = panelIndex !== index; });
+            }
+            buttons.forEach((button, index) => {
+                button.addEventListener('click', () => activate(index));
+                button.addEventListener('keydown', event => {
+                    let next: number;
+                    if (event.key === 'ArrowRight') next = (index + 1) % buttons.length;
+                    else if (event.key === 'ArrowLeft') next = (index - 1 + buttons.length) % buttons.length;
+                    else if (event.key === 'Home') next = 0;
+                    else if (event.key === 'End') next = buttons.length - 1;
+                    else return;
+                    event.preventDefault();
+                    activate(next);
+                    buttons[next].focus();
                 });
-
-                // Mostrar el contenido correspondiente
-                const targetContent = document.querySelector(`.tab-content[data-tab="${targetTab}"]`);
-                if (targetContent) {
-                    targetContent.classList.add('active');
-                }
             });
         });
-    });
+    }
+    initializePriceTabs();
+    document.addEventListener('astro:page-load', initializePriceTabs);
 </script>
-
-<style>
-    .tab-content {
-        display: none;
-        animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .tab-content.active {
-        display: block;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-
-</style>

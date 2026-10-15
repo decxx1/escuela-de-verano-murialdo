@@ -3,7 +3,7 @@ import Dropdown from "./Dropdown";
 
 const links = [
     { href: "/actividades", label: "Actividades" },
-    { href: "/temporada", label: "Fechas y precios" },
+    { href: "/temporada", label: "Temporada" },
     { href: "/contacto", label: "Contacto" },
     { href: "/galeria", label: "Fotos" },
     { href: "/blog", label: "Noticias" },

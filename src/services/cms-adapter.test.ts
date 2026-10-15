@@ -76,6 +76,20 @@ test('omits gallery files explicitly hidden from the public media response', () 
   expect(adaptSnapshot(data).albumes[0].Fotos.length).toBe(1);
 });
 
+test('selects a new season before its dates exist instead of keeping the previous dated season', () => {
+  const data = snapshot();
+  data.contents.seasons = [
+    { ...entry('seasons', 1, { starts_at: '2025-12-09', ends_at: '2026-02-19' }), title: '2025–2026' },
+    { ...entry('seasons', 2), title: '2026–2027' },
+  ];
+  const fecha = adaptSnapshot(data).fecha!;
+  expect(fecha.Temporada).toBe('2026–2027');
+  expect(fecha.Inicio).toBe('');
+  expect(fecha.Fin).toBe('');
+  expect(fecha.IngresoSalida).toEqual([]);
+  expect(fecha.HorariosGuardia).toEqual([]);
+});
+
 test('uses one shared prices heading and retains each turn with its conditions and payment amounts', () => {
   const data = snapshot();
   data.contents.settings[0].data.prices_heading = '  Precios promocionales de octubre  ';
