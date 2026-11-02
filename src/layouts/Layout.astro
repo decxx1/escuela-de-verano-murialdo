@@ -10,7 +10,8 @@ import Footer from '@/components/Footer.astro';
 import Header from '@/components/Header.jsx';
 import FloatingButton from '@/components/FloatingButton.astro';
 import { ClientRouter } from 'astro:transitions';
-import { contactoService, ajusteService, equipoService } from '@/services/cms';
+import { contactoService, ajusteService, equipoService, fechaService, precioService } from '@/services/cms';
+import { availableSeasonSections } from '@/services/season-content';
 
 import type { Preload } from "@/types/Preload"
 
@@ -32,8 +33,15 @@ const {
 
 // Obtener la ruta actual
 const currentPath = Astro.url.pathname;
-const [, ajustesResponse] = await Promise.all([contactoService.getContacto(), ajusteService.getAjustes()]);
-const showTeam = ajustesResponse.data.HabilitarEquipo &&
+const [, ajustesResponse, temporadaResponse] = await Promise.all([
+	contactoService.getContacto(),
+	ajusteService.getAjustes(),
+	fechaService.getFecha(),
+]);
+const ajustes = ajustesResponse.data;
+const turnos = temporadaResponse.data && ajustes.HabilitarPrecios ? (await precioService.getPrecios()).data : [];
+const seasonSections = availableSeasonSections(temporadaResponse.data, ajustes, turnos);
+const showTeam = ajustes.HabilitarEquipo &&
 	(await equipoService.getEquipos()).data.some((miembro) => miembro.Activo);
 ---
 <!doctype html>
@@ -89,7 +97,7 @@ const showTeam = ajustesResponse.data.HabilitarEquipo &&
 				</div>
 			</div>
 		</div>
-		<Header client:load currentPath={currentPath} showTeam={showTeam} />
+		<Header client:load currentPath={currentPath} showTeam={showTeam} seasonSections={seasonSections} />
 		<main>
 			<slot />
 		</main>
